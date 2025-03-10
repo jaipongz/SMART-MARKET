@@ -121,7 +121,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
+            /* display: flex; */
             justify-content: center;
             align-items: center;
             font-family: 'Kanit', sans-serif;
