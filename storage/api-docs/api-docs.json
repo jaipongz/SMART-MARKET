@@ -1,0 +1,254 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "description": "API documentation for the application",
+        "contact": {
+            "email": "support@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "description": "Authenticate user and return JWT token",
+                "operationId": "b7a6cf57384075935c06b04fd4cac46c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJK..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/getItems": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Retrieve player items",
+                "description": "Fetch items associated with a specific player ID.",
+                "operationId": "f4136d142974d3359df97ad7ea564f16",
+                "parameters": [
+                    {
+                        "name": "playerId",
+                        "in": "query",
+                        "description": "The ID of the player whose items are being retrieved.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "xxxxxxxx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Items retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "itemId": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "itemName": {
+                                                        "type": "string",
+                                                        "example": "Sword of Light"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "rarity": {
+                                                        "type": "string",
+                                                        "example": "legendary"
+                                                    },
+                                                    "equipped": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "playerId is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/updatePlayerData": {
+            "post": {
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Update or insert player data",
+                "description": "Update existing player data or insert a new record if the player does not exist.",
+                "operationId": "9533d57503e92fc10e6b72efcfe8b11f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "playerId",
+                                    "role",
+                                    "rank",
+                                    "race",
+                                    "clan",
+                                    "money"
+                                ],
+                                "properties": {
+                                    "playerId": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "Warrior"
+                                    },
+                                    "rank": {
+                                        "type": "string",
+                                        "example": "Elite"
+                                    },
+                                    "race": {
+                                        "type": "string",
+                                        "example": "Elf"
+                                    },
+                                    "clan": {
+                                        "type": "string",
+                                        "example": "Shadow Clan"
+                                    },
+                                    "money": {
+                                        "type": "string",
+                                        "example": "10000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Player data has been updated or inserted successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Player data has been updated or inserted successfully!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation error: playerId is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Items",
+            "description": "Items"
+        },
+        {
+            "name": "Player",
+            "description": "Player"
+        }
+    ]
+}

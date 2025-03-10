@@ -1,0 +1,99 @@
+body {
+	font-family: 'Kanit', sans-serif;
+	background-color: #f4f4f9;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.container {
+	background: #fff;
+	border-radius: 15px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	text-align: center;
+	width: 90%;
+	max-width: 500px;
+	position: relative;
+}
+
+.header {
+	background: #007bff;
+	color: #fff;
+	font-size: 18px;
+	padding: 15px;
+	text-align: center;
+	border-radius: 12px 12px 0 0;
+	position: relative;
+}
+
+.back-btn {
+	position: absolute;
+	left: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+	background: #fff;
+	color: #007bff;
+	border: none;
+	padding: 5px 10px;
+	font-size: 14px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.back-btn:hover {
+	background: #f0f0f0;
+}
+
+h1 {
+	margin: 10px 0;
+	font-size: 22px;
+	color: #333;
+}
+
+#barcode {
+	position: relative;
+	background: #000;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+video {
+	width: 100%;
+	display: block;
+}
+
+#scan-line {
+	position: absolute;
+	top: 50%;
+	left: 15px;
+	right: 15px;
+	height: 2px;
+	background: red;
+	animation: scan 2s infinite linear;
+}
+
+/* @keyframes scan {
+	0% { top: 15%; }
+	50% { top: 85%; }
+	100% { top: 15%; }
+} */
+
+#result {
+	margin-top: 15px;
+	font-size: 20px;
+	font-weight: bold;
+	color: #28a745;
+	min-height: 30px;
+}
+
+/* ซ่อน canvas ประมวลผล */
+#barcodecanvas,
+#barcodecanvasg {
+	display: none;
+}
+
+/*  */
