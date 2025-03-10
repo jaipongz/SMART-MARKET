@@ -112,7 +112,7 @@
         }
 
         .modal {
-            /* display: none; */
+            display: none;
             /* เริ่มซ่อน */
             position: fixed;
             z-index: 1000;
@@ -127,18 +127,6 @@
             font-family: 'Kanit', sans-serif;
             overflow: hidden;
         }
-
-        /* .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        } */
 
         .modal-content {
             background: #fff;
@@ -198,6 +186,9 @@
             border: 1px solid #ccc;
             display: block;
         }
+        a{
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -205,7 +196,7 @@
 
     <div class="container">
         <div class="header">
-            <button class="back-btn" onclick="goBack()">⬅️</button>
+            <a class="back-btn" href="{{route('merchantScan',[Auth::user()->id])}}">⬅️</a>
             สแกนบาร์โค้ด
         </div>
 

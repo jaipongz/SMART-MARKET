@@ -54,6 +54,9 @@
             height: 50px;
             margin-bottom: 10px;
         }
+        a{
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>

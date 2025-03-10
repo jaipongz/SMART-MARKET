@@ -14,7 +14,7 @@ class UserController extends Controller
 
         $products = DB::table('products')
             ->where('merchant_id', $merchantId)
-            ->select('product_id', 'product_name', 'amount', 'price', 'created_at')
+            ->select('product_id','product_pic', 'product_name', 'amount', 'price', 'created_at')
             ->offset($start)
             ->limit($limit)
             ->get();

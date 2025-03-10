@@ -22,14 +22,15 @@
             <!-- Header -->
             <div class="mb-6">
                 <h2 class="font-semibold text-3xl text-gray-800 leading-tight">สินค้าของคุณ</h2>
-                <p class="mt-2 text-gray-600">ยินดีต้อนรับเข้าสู่ระบบ {{$merchant->name}}</p>
+                <p class="mt-2 text-gray-600">ยินดีต้อนรับเข้าสู่ระบบ {{ $merchant->name }}</p>
             </div>
 
             <!-- ปุ่มเพิ่มสินค้า -->
             <div class="mb-6">
-                <button onclick="openModal()" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                <a href="{{ route('merchantScan', [Auth::user()->id]) }}"
+                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
                     เพิ่มสินค้า
-                </button>
+                </a>
             </div>
 
             <!-- ตารางสินค้า -->
@@ -37,7 +38,7 @@
                 <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
                     <thead>
                         <tr class="bg-gray-100 text-gray-600">
-                            <th class="py-3 px-6 text-left">#</th>
+                            <th class="py-3 px-6 text-left"></th>
                             <th class="py-3 px-6 text-left">ชื่อสินค้า</th>
                             <th class="py-3 px-6 text-left">จำนวน</th>
                             <th class="py-3 px-6 text-left">ราคา</th>
@@ -48,7 +49,14 @@
                     <tbody>
                         @foreach ($products as $item)
                             <tr class="border-b">
-                                <td class="py-3 px-6 text-left">{{ $item->product_id }}</td>
+                                <td class="py-3 px-6 text-left">
+                                    @if ($item->product_pic)
+                                        <img src="data:image/jpeg;base64,{{ $item->product_pic }}" alt="Product Image"
+                                            style="max-width: 100px; max-height: 100px;">
+                                    @else
+                                        <span>No Image</span>
+                                    @endif
+                                </td>
                                 <td class="py-3 px-6 text-left">{{ $item->product_name }}</td>
                                 <td class="py-3 px-6 text-left">{{ $item->amount }}</td>
                                 <td class="py-3 px-6 text-left">{{ $item->price }}</td>
