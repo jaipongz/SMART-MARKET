@@ -112,7 +112,7 @@
         }
 
         .modal {
-            display: none;
+            /* display: none; */
             /* เริ่มซ่อน */
             position: fixed;
             z-index: 1000;
@@ -128,7 +128,7 @@
             overflow: hidden;
         }
 
-        .modal {
+        /* .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -138,7 +138,7 @@
             background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
-        }
+        } */
 
         .modal-content {
             background: #fff;
@@ -233,6 +233,7 @@
                 @csrf
                 <input type="text" id="merchantId" name="merchantId" value="{{Auth::user()->id}}">
                 <label>รหัสสินค้า:</label>
+                {{-- <input type="text" id="productCode" name="barcode" > --}}
                 <input type="text" id="productCode" name="barcode" readonly>
 
                 <label>ชื่อสินค้า:</label>
