@@ -222,7 +222,7 @@
             <form method="POST" action="{{ route('product.store') }}" enctype="multipart/form-data">
             {{-- <form method="POST" enctype="multipart/form-data"> --}}
                 @csrf
-                <input type="text" id="merchantId" name="merchantId" value="{{Auth::user()->id}}">
+                <input type="text" style="display: none" id="merchantId" name="merchantId" value="{{Auth::user()->id}}">
                 <label>รหัสสินค้า:</label>
                 {{-- <input type="text" id="productCode" name="barcode" > --}}
                 <input type="text" id="productCode" name="barcode" readonly>
