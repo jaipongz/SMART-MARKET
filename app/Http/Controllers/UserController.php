@@ -29,6 +29,10 @@ class UserController extends Controller
     {
         return view('merchant.scaner', ['merchant' => $merchantId]);
     }
+    public function welcome()
+    {
+        return view('dashboard');
+    }
     public function storeProduct(Request $request)
     {
         // ตรวจสอบค่าที่ส่งมาจากฟอร์ม

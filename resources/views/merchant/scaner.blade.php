@@ -196,7 +196,7 @@
 
     <div class="container">
         <div class="header">
-            <a class="back-btn" href="{{route('merchantScan',[Auth::user()->id])}}">⬅️</a>
+            <a class="back-btn" href="{{route('merchant.welcome')}}">⬅️</a>
             สแกนบาร์โค้ด
         </div>
 
