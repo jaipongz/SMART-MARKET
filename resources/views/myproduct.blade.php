@@ -20,11 +20,23 @@
         <!-- Main Content -->
         <div class="w-full sm:w-5/6 bg-white p-6">
             <!-- Header -->
-            <div class="mb-6">
-                <h2 class="font-semibold text-3xl text-gray-800 leading-tight">สินค้าของคุณ</h2>
-                <p class="mt-2 text-gray-600">ยินดีต้อนรับเข้าสู่ระบบ {{ $merchant->name }}</p>
+            <div class="mb-6 flex items-center space-x-4">
+                <!-- รูปโปรไฟล์ร้านค้า -->
+                @if($merchant->profile_pic)
+                    <img src="data:image/jpeg;base64,{{ $merchant->profile_pic }}" alt="Merchant Profile"
+                        class="w-16 h-16 object-cover rounded-full shadow">
+                @else
+                    <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                        📷
+                    </div>
+                @endif
+            
+                <!-- ข้อความต้อนรับ -->
+                <div>
+                    <h2 class="font-semibold text-3xl text-gray-800">สินค้าของคุณ</h2>
+                    <p class="mt-2 text-gray-600">ยินดีต้อนรับ {{ $merchant->name }}</p>
+                </div>
             </div>
-
             <!-- ปุ่มเพิ่มสินค้า -->
             <div class="mb-6">
                 <a href="{{ route('merchantScan', [Auth::user()->id]) }}"
@@ -82,11 +94,11 @@
 
             <!-- Logout Button -->
             <div class="mt-6">
-                <form method="POST" action="/logout">
+                <form method="POST" action="{{route('logout')}}">
                     @csrf
                     <button type="submit"
                         class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
-                        Logout
+                        ออกจากระบบ
                     </button>
                 </form>
             </div>

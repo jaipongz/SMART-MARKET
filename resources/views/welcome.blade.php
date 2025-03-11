@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
+
         body {
             display: flex;
             justify-content: center;
@@ -19,6 +21,7 @@
             background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
             padding: 20px;
         }
+
         .container {
             background: #ffffff;
             padding: 30px;
@@ -28,11 +31,13 @@
             width: 100%;
             max-width: 400px;
         }
+
         h1 {
             font-size: 24px;
             color: #102a43;
             margin-bottom: 20px;
         }
+
         .button {
             display: block;
             width: 100%;
@@ -46,9 +51,11 @@
             cursor: pointer;
             transition: background 0.3s;
         }
+
         .button:hover {
             background: #0056b3;
         }
+
         .icon {
             width: 50px;
             height: 50px;
@@ -56,19 +63,34 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Barcode Scanner App</h1>
-    <a class="button" href="{{route('user.verify')}}">ซื้อของ</a>
-    <a class="button" href="{{ route('admin.login') }}">ร้านค้า</a>
-</div>
+    <div class="container">
+        <h1>Barcode Scanner App</h1>
+        <a class="button" href="{{ route('user.verify') }}">ซื้อของ</a>
+        @if (Route::has('login'))
+            @auth('web')
+                <a href="{{ url('/dashboard') }}" class="button">
+                    ร้านค้า
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="button">
+                    ร้านค้า
+                </a>
+            @endauth
 
-<script>
-    function goTo(page) {
-        window.location.href = page;
-    }
-</script>
+
+        @endif
+        {{-- <a class="button" href="{{ route('admin.login') }}">ร้านค้า</a> --}}
+    </div>
+
+    <script>
+        function goTo(page) {
+            window.location.href = page;
+        }
+    </script>
 
 </body>
+
 </html>

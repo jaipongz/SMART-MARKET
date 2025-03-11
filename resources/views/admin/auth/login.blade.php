@@ -43,13 +43,6 @@
                     @enderror
                 </div>
 
-                <!-- Remember Me -->
-                <div class="flex items-center mb-4">
-                    <input id="remember_me" type="checkbox" name="remember" 
-                           class="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-600 focus:ring-indigo-500">
-                    <label for="remember_me" class="ms-2 text-sm">{{ __('Remember me') }}</label>
-                </div>
-
                 <!-- Forgot Password and Login Button -->
                 <div class="flex items-center justify-end" style="gap:  10px">
                     <a class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" href="{{ route('admin.register') }}">ลงทะเบียน</a>

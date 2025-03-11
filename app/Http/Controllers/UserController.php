@@ -22,7 +22,7 @@ class UserController extends Controller
         // dd($products);
         $user = DB::table('users')
         ->where('id', $merchantId)
-        ->select('id', 'name', 'email', 'created_at')
+        ->select('id', 'name', 'email','profile_pic', 'created_at')
         ->first(); // Use first() since it should return one row
         return view('myproduct', ['products' => $products, 'merchant' => $user]);
     }
