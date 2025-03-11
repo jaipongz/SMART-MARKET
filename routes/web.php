@@ -11,6 +11,9 @@ Route::post('/api/updatePlayerData', [APIController::class, 'updatePlayerData'])
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/verify-store', [UserController::class, 'verifyStore'])->name('user.verify');
+Route::get('/get-merchant-info', [UserController::class, 'getMerchantInfo']);
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -26,8 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/products', [UserController::class, 'update'])->name('product.update');
     Route::delete('/product/{id}', [UserController::class, 'destroy'])->name('product.destroy');
     Route::get('/merchant/home', [UserController::class, 'welcome'])->name('merchant.welcome');
-
 });
+
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin-auth.php';

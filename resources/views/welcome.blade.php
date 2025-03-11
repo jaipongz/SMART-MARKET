@@ -60,7 +60,7 @@
 
 <div class="container">
     <h1>Barcode Scanner App</h1>
-    <button class="button" onclick="goTo('scaner/index.html')">ซื้อของ</button>
+    <a class="button" href="{{route('user.verify')}}">ซื้อของ</a>
     <a class="button" href="{{ route('admin.login') }}">ร้านค้า</a>
 </div>
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Products;
+use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
     public function getProducts($merchantId, $start = null, $limit = null)
@@ -32,6 +33,10 @@ class UserController extends Controller
     public function welcome()
     {
         return view('dashboard');
+    }
+    public function verifyStore()
+    {
+        return view('scan-store');
     }
     public function storeProduct(Request $request)
     {
@@ -67,7 +72,7 @@ class UserController extends Controller
         
         return redirect()->back()->with('success', 'เพิ่มสินค้าสำเร็จ!');
     }
-
+    
     public function update(Request $request)
     {
         // dd($request);        // ค้นหาสินค้า
@@ -89,13 +94,30 @@ class UserController extends Controller
     public function destroy($id)
     {
         $product = Products::find($id);
-    
+        
         if ($product) {
             $product->delete();
             return redirect()->back()->with('status', 'Product deleted successfully!');
         }
-    
+        
         return redirect()->back()->with('error', 'Product not found!');
     }
     
+    public function getMerchantInfo(Request $request)
+    {
+        $merchantId = $request->input('merchantId');
+        Log::info("Received merchantId: $merchantId");
+        
+        $merchant = DB::table('users')
+        ->where('id', $merchantId)
+        ->select('id', 'name', 'email', 'created_at')
+        ->first();
+        
+        if (!$merchant) {
+            Log::error("Merchant not found for ID: $merchantId");
+            return response()->json(['error' => 'Merchant not found'], 404);
+        }
+        
+        return response()->json($merchant);
+    }
 }
