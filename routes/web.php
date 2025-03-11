@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/products{productId}', [UserController::class, 'getProducts'])->name('getProducts');
     Route::get('/merchantScan{merchantId}', [UserController::class, 'merchantScan'])->name('merchantScan');
     Route::post('/products', [UserController::class, 'storeProduct'])->name('product.store');
+    Route::put('/products', [UserController::class, 'update'])->name('product.update');
+    Route::delete('/product/{id}', [UserController::class, 'destroy'])->name('product.destroy');
     Route::get('/merchant/home', [UserController::class, 'welcome'])->name('merchant.welcome');
 
 });
