@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script>
-        var sound = new Audio("barcode.wav");
+        var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
 
         $(document).ready(function() {
