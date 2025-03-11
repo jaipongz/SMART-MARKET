@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap">
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     {{-- <link rel="stylesheet" href="https://pirate-town.manga208.com/public/assets/css/scaner.css'"> --}}
 
     <style>
@@ -186,8 +187,16 @@
             border: 1px solid #ccc;
             display: block;
         }
-        a{
+
+        a {
             text-decoration: none;
+        }
+
+        #Mybarcode {
+            width: 100%;
+            /* ทำให้บาร์โค้ดขยายตามขนาดของ container */
+            /* height: 80px; */
+            /* ปรับความสูงของบาร์โค้ด */
         }
     </style>
 </head>
@@ -196,7 +205,7 @@
 
     <div class="container">
         <div class="header">
-            <a class="back-btn" href="{{route('merchant.welcome')}}">⬅️</a>
+            <a class="back-btn" href="{{ route('merchant.welcome') }}">⬅️</a>
             สแกนบาร์โค้ด
         </div>
 
@@ -207,7 +216,10 @@
             <div id="scan-line"></div>
         </div>
 
-        <div id="result">📡 รอสแกนบาร์โค้ด...</div>
+        <div id="result">
+            <button id="generateBarcode"
+                class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">โค้ดร้านค้าของคุณ</button>
+        </div>
         {{-- {{Auth::user()->id}} --}}
         <canvas id="barcodecanvas"></canvas>
         <canvas id="barcodecanvasg"></canvas>
@@ -220,9 +232,10 @@
             <h3>เพิ่มสินค้า</h3>
 
             <form method="POST" action="{{ route('product.store') }}" enctype="multipart/form-data">
-            {{-- <form method="POST" enctype="multipart/form-data"> --}}
+                {{-- <form method="POST" enctype="multipart/form-data"> --}}
                 @csrf
-                <input type="text" style="display: none" id="merchantId" name="merchantId" value="{{Auth::user()->id}}">
+                <input type="text" style="display: none" id="merchantId" name="merchantId"
+                    value="{{ Auth::user()->id }}">
                 <label>รหัสสินค้า:</label>
                 {{-- <input type="text" id="productCode" name="barcode" > --}}
                 <input type="text" id="productCode" name="barcode" readonly>
@@ -246,6 +259,17 @@
         </div>
     </div>
 
+    <div id="barcodeModal" class="modal">
+        <div class="modal-content">
+            <h2>Barcode ของร้านค้าของคุณ</h2>
+            <svg id="Mybarcode"></svg>
+            <div class="mt-4">
+                <button id="closeBarModal"
+                    class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700">ปิด</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 <script>
@@ -265,7 +289,7 @@
             barcode.setHandler(function(barcode) {
                 if (!isScanning) return;
 
-                $('#result').html('📦 บาร์โค้ด: ' + barcode);
+                // $('#result').html('📦 บาร์โค้ด: ' + barcode);
                 playSound();
                 isScanning = false;
                 showProductDetail(barcode);
@@ -309,6 +333,32 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    const merchantId = document.getElementById('merchantId').value;
+
+    // Open modal and generate barcode when the button is clicked
+    document.getElementById('generateBarcode').addEventListener('click', function() {
+        // Show the modal
+        document.getElementById('barcodeModal').style.display = 'flex';
+
+        console.log("Merchant ID: ", merchantId); // Make sure the merchantId is correct
+
+        // Generate the barcode using JsBarcode
+        JsBarcode("#Mybarcode", merchantId, {
+            // format: "CODE128", // Barcode format (you can choose different formats)
+            format: "EAN13", // Barcode format (you can choose different formats)
+            lineColor: "#000000", // Barcode line color
+            width: 4, // Width of each barcode line
+            height: 100, // Height of the barcode
+            displayValue: true, // Show the barcode number under the barcode
+            fontSize: 18 // Font size of the displayed value
+        });
+    });
+
+    // Close the modal when clicking the close button
+    document.getElementById('closeBarModal').addEventListener('click', function() {
+        document.getElementById('barcodeModal').style.display = 'none';
+    });
 </script>
 
 </html>

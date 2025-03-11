@@ -49,10 +49,10 @@
                     <tbody>
                         @foreach ($products as $item)
                             <tr class="border-b">
-                                <td class="w-32 h-32 object-cover rounded">
+                                <td >
                                     @if ($item->product_pic)
-                                        <img src="data:image/jpeg;base64,{{ $item->product_pic }}" alt="Product Image"
-                                            style="max-width: 100px; max-height: 100px;">
+                                        <img  src="data:image/jpeg;base64,{{ $item->product_pic }}" alt="Product Image"
+                                        class="w-32 h-32 object-cover rounded m-2">
                                     @else
                                         <span>No Image</span>
                                     @endif
