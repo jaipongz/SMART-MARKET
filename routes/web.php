@@ -12,6 +12,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/scan-product', [UserController::class, 'scanProduct']);
+Route::get('/get-product-details', [UserController::class, 'getProductDetails']);
 // Route::get('/scan-product', function () {
 //     return view('scan-product');
 // });

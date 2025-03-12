@@ -166,4 +166,36 @@ class UserController extends Controller
         // ส่งข้อมูลไปยัง view
         return view('scan-product', compact('merchantName', 'merchantId'));
     }
+
+    public function getProductDetails(Request $request)
+    {
+        $merchantId = $request->query('merchantId');
+        $barcode = $request->query('barcode');
+
+        // ดึงข้อมูลสินค้าจากฐานข้อมูลตาม merchantId และ barcode
+        $product = Products::where('merchant_id', $merchantId)
+            ->where('product_id', $barcode)
+            ->first();
+
+        if ($product) {
+            // เช็คจำนวนสินค้า
+            if ($product->amount <= 0) {
+                return response()->json([
+                    'error' => 'สินค้าหมด'
+                ], 404);
+            }
+
+            return response()->json([
+                'product' => [
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'image' => $product->product_pic, // base64
+                    'amount' => $product->amount
+                ]
+            ]);
+        } else {
+            return response()->json(['error' => 'ไม่พบข้อมูลสินค้า'], 404);
+        }
+    }
+
 }
