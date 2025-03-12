@@ -9,6 +9,9 @@
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     {{-- <link rel="stylesheet" href="style.css"> --}}
     <script>
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
@@ -90,6 +93,10 @@
         function closeModal() {
             $('#merchantModal').fadeOut();
         }
+
+        function closeErrorModal() {
+            $('#errorModal').fadeOut();
+        }
     </script>
 
 </head>
@@ -126,9 +133,11 @@
                 style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">
                 ชื่อร้านค้า</h3>
             <p id="merchantEmail" style="font-size: 16px; color: #666; text-align: center; margin-bottom: 5px;">อีเมล์:
-                <span>email@example.com</span></p>
+                <span>email@example.com</span>
+            </p>
             <p id="merchantCreatedAt" style="font-size: 16px; color: #666; text-align: center;">วันที่สร้าง:
-                <span>2023-01-01</span></p>
+                <span>2023-01-01</span>
+            </p>
 
             <div class="modal-footer" style="text-align: center; margin-top: 20px;">
                 <button onclick="buyNow()"
@@ -139,10 +148,16 @@
         </div>
     </div>
 
-    <div id="errorModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px;">
-        <p id="errorModalMessage"></p>
-        <button onclick="$('#errorModal').fadeOut();">ปิด</button>
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle"></i> <!-- ใช้ FontAwesome -->
+            </div>
+            <p id="errorModalMessage"></p>
+            <button class="close-btn" onclick="closeErrorModal()">ปิด</button>
+        </div>
     </div>
+
 
 </body>
 <style>
