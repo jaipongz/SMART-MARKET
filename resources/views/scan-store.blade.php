@@ -134,7 +134,7 @@
         <canvas id="barcodecanvas"></canvas>
         <canvas id="barcodecanvasg"></canvas>
     </div>
-    <div id="merchantModal" class="modal">
+    <div id="merchantModal" style="display:none;" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
             <div class="profile-img-container"
