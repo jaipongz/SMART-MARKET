@@ -11,9 +11,10 @@ Route::post('/api/updatePlayerData', [APIController::class, 'updatePlayerData'])
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/scan-product', function () {
-    return view('scan-product');
-});
+Route::get('/scan-product', [UserController::class, 'scanProduct']);
+// Route::get('/scan-product', function () {
+//     return view('scan-product');
+// });
 Route::get('/verify-store', [UserController::class, 'verifyStore'])->name('user.verify');
 Route::get('/get-merchant-info', [UserController::class, 'getMerchantInfo']);
 Route::post('/upload-merchant-profile', [UserController::class, 'updateProfilepic']);

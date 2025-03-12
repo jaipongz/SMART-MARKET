@@ -96,19 +96,22 @@
 <body>
 
 	<div class="container">
-		<div class="header">
+		<div class="header bg-green-600">
 			<button class="back-btn" onclick="goBack()">⬅️</button>
-			สแกนบาร์โค้ด
+			ซื้อสินค้า
 		</div>
 
-		<h1>📷 Barcode Scanner</h1>
+		<h1 id="storeName">ร้านค้าของคุณ</h1>
 
 		<div id="barcode">
 			<video id="barcodevideo" autoplay playsinline></video>
 			<div id="scan-line"></div>
 		</div>
 
-		<div id="result">📡 รอสแกนบาร์โค้ด...</div>
+		<div id="result">
+            <button id="generateBarcode"
+                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 ml-4">ตะกร้าสินค้า</button>
+        </div>
 
 		<!-- canvas ซ่อนประมวลผล -->
 		<canvas id="barcodecanvas"></canvas>
@@ -131,5 +134,155 @@
 		</div>
 	</div>
 </body>
+<style>
+	.modal-icon i {
+        font-size: 120px;
+        color: rgb(255, 70, 70)
+            /* ปรับขนาดได้ตามต้องการ */
+    }
 
+    body {
+        font-family: 'Kanit', sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .header {
+        color: #fff;
+        font-size: 18px;
+        padding: 15px;
+        text-align: center;
+        border-radius: 12px 12px 0 0;
+        position: relative;
+    }
+
+    .back-btn {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        color: #28a745;
+        border: none;
+        padding: 5px 10px;
+        font-size: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .back-btn:hover {
+        background: #f0f0f0;
+    }
+
+    h1 {
+        margin: 10px 0;
+        font-size: 22px;
+        color: #333;
+    }
+
+    #barcode {
+        position: relative;
+        background: #000;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    video {
+        width: 100%;
+        display: block;
+    }
+
+    #scan-line {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        right: 15px;
+        height: 2px;
+        background: red;
+        animation: scan 2s infinite linear;
+    }
+
+    /* @keyframes scan {
+ 0% { top: 15%; }
+ 50% { top: 85%; }
+ 100% { top: 15%; }
+} */
+
+    #result {
+        margin-top: 15px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #28a745;
+        min-height: 30px;
+    }
+
+    /* ซ่อน canvas ประมวลผล */
+    #barcodecanvas,
+    #barcodecanvasg {
+        display: none;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        width: 400px;
+        max-width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        text-align: center;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+
+    .modal-footer button {
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .modal-footer button:hover {
+        background-color: #3b82f6;
+    }
+</style>
 </html>

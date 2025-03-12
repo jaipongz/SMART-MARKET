@@ -153,4 +153,10 @@ class UserController extends Controller
             'profile_pic' => $merchant->profile_pic,
         ]);
     }
+
+    public function scanProduct(Request $request) {
+        dd($request);
+        $storeName = $request->query('name', 'ร้านค้าของคุณ'); // ตั้งค่าเริ่มต้นเผื่อไม่มีค่า
+        return view('scan-product', compact('storeName'));
+    }
 }
