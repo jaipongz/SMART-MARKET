@@ -11,7 +11,7 @@ Route::post('/api/updatePlayerData', [APIController::class, 'updatePlayerData'])
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('/scan-product', [UserController::class, 'scanProduct']);
+Route::get('/scan-product', [UserController::class, 'scanProduct']);
 // Route::get('/scan-product', function () {
 //     return view('scan-product');
 // });

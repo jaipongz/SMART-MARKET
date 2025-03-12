@@ -10,12 +10,12 @@
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <link rel="stylesheet" href="style.css"> --}}
     <script>
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
-        var merchantId;
+        var merchantId = "633121070116";
         $(document).ready(function() {
             initBarcodeScanner();
 
@@ -100,26 +100,15 @@
 
         function buyNow() {
             let merchantData = {
-                id:merchantId,
+                id: merchantId,
                 name: $('#merchantName').text().replace('ร้าน ', ''),
-                email: $('#merchantEmail span').text(),
-                created_at: $('#merchantCreatedAt span').text()
             };
 
-            // ใช้ AJAX ส่งข้อมูลไปที่ Controller
-            $.ajax({
-                url: '/scan-product', // route ที่ไปที่ฟังก์ชันใน Controller
-                method: 'POST',
-                data: merchantData,
-                success: function(response) {
-                    // รับข้อมูลจาก Controller และแสดงในหน้า View
-                    console.log(response);
-                    window.location.href = '/scan-product'; // ไปยังหน้า scan-product
-                },
-                error: function(error) {
-                    console.error('เกิดข้อผิดพลาด:', error);
-                }
-            });
+            // เข้ารหัสข้อมูลให้อยู่ในรูปแบบ URL-encoded
+            let params = new URLSearchParams(merchantData).toString();
+
+            // ไปยังหน้า scan-product พร้อมส่งข้อมูลใน query parameters
+            window.location.href = `/scan-product?${params}`;
         }
     </script>
 
@@ -145,7 +134,7 @@
         <canvas id="barcodecanvas"></canvas>
         <canvas id="barcodecanvasg"></canvas>
     </div>
-    <div id="merchantModal" style="display:none;" class="modal">
+    <div id="merchantModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
             <div class="profile-img-container"

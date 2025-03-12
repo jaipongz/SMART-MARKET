@@ -90,6 +90,7 @@
 
 			closeModal();
 		}
+		
 	</script>
 </head>
 
@@ -101,7 +102,7 @@
 			ซื้อสินค้า
 		</div>
 
-		<h1 id="storeName">ร้านค้าของคุณ</h1>
+		<h1 id="storeName">{{ $merchantName }}</h1>
 
 		<div id="barcode">
 			<video id="barcodevideo" autoplay playsinline></video>

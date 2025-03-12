@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Products;
 use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
@@ -157,10 +158,12 @@ class UserController extends Controller
 
     public function scanProduct(Request $request)
     {
-        // รับข้อมูลจาก JavaScript
-        $storeData = $request->all();
+        // รับข้อมูลจาก query parameters
+        // dd($request);
+        $merchantId = $request->query('id');
+        $merchantName = $request->query('name');
 
-        // ส่งข้อมูลไปยัง View
-        return view('scan-product', compact('storeData'));
+        // ส่งข้อมูลไปยัง view
+        return view('scan-product', compact('merchantName', 'merchantId'));
     }
 }
