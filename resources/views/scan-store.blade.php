@@ -9,7 +9,6 @@
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     {{-- <link rel="stylesheet" href="style.css"> --}}
@@ -74,7 +73,7 @@
                     },
                     error: function(error) {
                         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', error);
-                        showErrorModal('เกิดข้อผิดพลาด ไม่สามารถดึงข้อมูลร้านค้าได้');
+                        showErrorModal('ไม่พบข้อมูลร้านค้า');
                     }
                 });
             }
@@ -86,7 +85,7 @@
         });
 
         function goBack() {
-            window.location.href = '../index.html'; // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
+            window.location.href = ''; // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
         }
 
 
@@ -97,6 +96,23 @@
         function closeErrorModal() {
             $('#errorModal').fadeOut();
         }
+
+        function buyNow() {
+            // ดึงค่าร้านค้าจาก modal
+            let merchantId = $('#merchantName').text().replace('ร้าน ', ''); // เอาแค่ชื่อ
+            let merchantEmail = $('#merchantEmail span').text();
+            let merchantCreatedAt = $('#merchantCreatedAt span').text();
+
+            // เข้ารหัส URL ป้องกันปัญหาเครื่องหมายพิเศษ
+            let params = new URLSearchParams({
+                name: merchantId,
+                email: merchantEmail,
+                created_at: merchantCreatedAt
+            });
+
+            // ไปที่หน้า scan-product พร้อมส่งข้อมูล
+            window.location.href = `/scan-product?${params.toString()}`;
+        }
     </script>
 
 </head>
@@ -105,7 +121,7 @@
 
     <div class="container">
         <div class="header">
-            <button class="back-btn" onclick="goBack()">⬅️</button>
+            <a class="back-btn" href="/">⬅️</a>
             เลือกร้านค้า
         </div>
 
@@ -149,12 +165,12 @@
     </div>
 
     <div id="errorModal" style="display:none;" class="modal">
-        <div class="modal-content">
+        <div class="modal-content  mx-4">
             <span class="close-btn" onclick="closeErrorModal()">✖</span>
             <div class="modal-icon">
-                <i class="fas fa-exclamation-circle"></i> <!-- ใช้ FontAwesome -->
+                <i class="fas fa-exclamation-circle" style=""></i> <!-- ใช้ FontAwesome -->
             </div>
-            <p id="errorModalMessage"></p>
+            <p style="margin: 30px 0 20px" id="errorModalMessage">ไม่พบข้อมูลร้านค้า</p>
         </div>
     </div>
 
@@ -164,7 +180,7 @@
     .modal-icon i {
         font-size: 120px;
         color: rgb(255, 70, 70)
-        /* ปรับขนาดได้ตามต้องการ */
+            /* ปรับขนาดได้ตามต้องการ */
     }
 
     body {
