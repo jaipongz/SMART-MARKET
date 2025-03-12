@@ -111,7 +111,7 @@ class UserController extends Controller
         
         $merchant = DB::table('users')
         ->where('id', $merchantId)
-        ->select('id', 'name', 'email', 'created_at')
+        ->select('id', 'name', 'email', 'created_at','profile_pic')
         ->first();
         
         if (!$merchant) {

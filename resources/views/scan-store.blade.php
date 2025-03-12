@@ -9,7 +9,7 @@
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    {{-- <link rel="stylesheet" href="style.css"> --}}
     <script>
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
@@ -62,6 +62,10 @@
                         $('#merchantEmail').find('span').text(response.email);
                         $('#merchantCreatedAt').find('span').text(response.created_at);
 
+                        // Add the profile image URL (Assuming response.profile_image contains the image URL)
+                        $('#merchantProfileImg').attr('src', 'data:image/jpeg;base64,' + response
+                            .profile_pic);
+
                         // Show the modal
                         $('#merchantModal').fadeIn();
                     },
@@ -80,7 +84,6 @@
         function closeModal() {
             $('#merchantModal').fadeOut();
         }
-
     </script>
 
 </head>
@@ -108,14 +111,19 @@
     <div id="merchantModal" style="display:none;" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
-            <h3 id="merchantName">ชื่อร้านค้า</h3>
-            <p id="merchantEmail">อีเมล์: <span>email@example.com</span></p>
-            <p id="merchantCreatedAt">วันที่สร้าง: <span>2023-01-01</span></p>
-
-            <!-- Optional: You can add more details about the merchant if needed -->
-            <div class="modal-footer">
+            <div class="profile-img-container" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+                <img id="merchantProfileImg" src="" alt="รูปโปรไฟล์ร้านค้า"
+                    style="max-width: 120px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); object-fit: cover;">
+            </div>
+            <h3 id="merchantName" style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">ชื่อร้านค้า</h3>
+            <p id="merchantEmail" style="font-size: 16px; color: #666; text-align: center; margin-bottom: 5px;">อีเมล์: <span>email@example.com</span></p>
+            <p id="merchantCreatedAt" style="font-size: 16px; color: #666; text-align: center;">วันที่สร้าง: <span>2023-01-01</span></p>
+    
+            <div class="modal-footer" style="text-align: center; margin-top: 20px;">
                 <button onclick="buyNow()"
-                    class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">ซื้อเลย</button>
+                    class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    ซื้อเลย
+                </button>
             </div>
         </div>
     </div>
@@ -221,102 +229,46 @@
     }
 
     .modal {
-        display: none;
-        /* เริ่มซ่อน */
         position: fixed;
-        z-index: 1000;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.5);
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: 'Kanit', sans-serif;
-        overflow: hidden;
+        z-index: 9999;
+        transition: opacity 0.3s ease-in-out;
     }
-
     .modal-content {
         background-color: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
+        padding: 30px;
+        border-radius: 10px;
+        width: 400px;
+        max-width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         position: relative;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal img {
-        width: 100%;
-        max-height: 200px;
-        object-fit: cover;
-        margin-bottom: 15px;
-        border-radius: 8px;
-    }
-
-    .modal h3 {
-        margin: 0;
-        font-size: 20px;
-        color: #333;
-    }
-
-    .modal p {
-        font-size: 16px;
-        color: #555;
-        margin: 10px 0;
-    }
-
-    .qty {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-        margin: 15px 0;
-    }
-
-    .qty button {
-        padding: 5px 15px;
-        font-size: 18px;
-        cursor: pointer;
-        border: none;
-        background: #007bff;
-        color: white;
-        border-radius: 6px;
-    }
-
-    .qty button:hover {
-        background: #0056b3;
-    }
-
-    .qty input {
-        width: 50px;
         text-align: center;
-        font-size: 18px;
     }
-
-    .modal-footer button {
-        background: #28a745;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .modal-footer button:hover {
-        background: #218838;
-    }
-
     .close-btn {
         position: absolute;
         top: 10px;
-        right: 15px;
-        cursor: pointer;
-        font-size: 18px;
+        right: 10px;
+        font-size: 24px;
+        font-weight: bold;
         color: #333;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+    .modal-footer button {
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .modal-footer button:hover {
+        background-color: #3b82f6;
     }
 </style>
 
