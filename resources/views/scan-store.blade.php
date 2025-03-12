@@ -148,19 +148,25 @@
         </div>
     </div>
 
-    <div id="errorModal" class="modal">
+    <div id="errorModal" style="display:none;" class="modal">
         <div class="modal-content">
+            <span class="close-btn" onclick="closeErrorModal()">✖</span>
             <div class="modal-icon">
                 <i class="fas fa-exclamation-circle"></i> <!-- ใช้ FontAwesome -->
             </div>
             <p id="errorModalMessage"></p>
-            <button class="close-btn" onclick="closeErrorModal()">ปิด</button>
         </div>
     </div>
 
 
 </body>
 <style>
+    .modal-icon i {
+        font-size: 120px;
+        color: rgb(255, 70, 70)
+        /* ปรับขนาดได้ตามต้องการ */
+    }
+
     body {
         font-family: 'Kanit', sans-serif;
         background-color: #f4f4f9;
