@@ -15,7 +15,7 @@
     <script>
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
-
+        var merchantId;
         $(document).ready(function() {
             initBarcodeScanner();
 
@@ -33,6 +33,7 @@
                     // $('#result').html('📦 บาร์โค้ด: ' + barcodeWithoutLastDigit);
                     playSound();
                     isScanning = false;
+                    merchantId = barcodeWithoutLastDigit;
                     showMerchantDetail(barcodeWithoutLastDigit);
                     // เปิดการสแกนใหม่หลังจาก 1.5 วินาที
                     setTimeout(function() {
@@ -98,20 +99,27 @@
         }
 
         function buyNow() {
-            // ดึงค่าร้านค้าจาก modal
-            let merchantId = $('#merchantName').text().replace('ร้าน ', ''); // เอาแค่ชื่อ
-            let merchantEmail = $('#merchantEmail span').text();
-            let merchantCreatedAt = $('#merchantCreatedAt span').text();
+            let merchantData = {
+                id:merchantId,
+                name: $('#merchantName').text().replace('ร้าน ', ''),
+                email: $('#merchantEmail span').text(),
+                created_at: $('#merchantCreatedAt span').text()
+            };
 
-            // เข้ารหัส URL ป้องกันปัญหาเครื่องหมายพิเศษ
-            let params = new URLSearchParams({
-                name: merchantId,
-                email: merchantEmail,
-                created_at: merchantCreatedAt
+            // ใช้ AJAX ส่งข้อมูลไปที่ Controller
+            $.ajax({
+                url: '/scan-product', // route ที่ไปที่ฟังก์ชันใน Controller
+                method: 'POST',
+                data: merchantData,
+                success: function(response) {
+                    // รับข้อมูลจาก Controller และแสดงในหน้า View
+                    console.log(response);
+                    window.location.href = '/scan-product'; // ไปยังหน้า scan-product
+                },
+                error: function(error) {
+                    console.error('เกิดข้อผิดพลาด:', error);
+                }
             });
-
-            // ไปที่หน้า scan-product พร้อมส่งข้อมูล
-            window.location.href = `/scan-product?${params.toString()}`;
         }
     </script>
 
