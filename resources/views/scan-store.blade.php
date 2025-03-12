@@ -28,7 +28,7 @@
                     if (!isScanning) return;
 
                     var barcodeWithoutLastDigit = barcode.slice(0, -1);
-                    $('#result').html('📦 บาร์โค้ด: ' + barcodeWithoutLastDigit);
+                    // $('#result').html('📦 บาร์โค้ด: ' + barcodeWithoutLastDigit);
                     playSound();
                     isScanning = false;
                     showMerchantDetail(barcodeWithoutLastDigit);
@@ -71,8 +71,14 @@
                     },
                     error: function(error) {
                         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', error);
+                        showErrorModal('เกิดข้อผิดพลาด ไม่สามารถดึงข้อมูลร้านค้าได้');
                     }
                 });
+            }
+
+            function showErrorModal(message) {
+                $('#errorModalMessage').text(message);
+                $('#errorModal').fadeIn();
             }
         });
 
@@ -111,14 +117,19 @@
     <div id="merchantModal" style="display:none;" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
-            <div class="profile-img-container" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+            <div class="profile-img-container"
+                style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
                 <img id="merchantProfileImg" src="" alt="รูปโปรไฟล์ร้านค้า"
                     style="max-width: 120px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); object-fit: cover;">
             </div>
-            <h3 id="merchantName" style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">ชื่อร้านค้า</h3>
-            <p id="merchantEmail" style="font-size: 16px; color: #666; text-align: center; margin-bottom: 5px;">อีเมล์: <span>email@example.com</span></p>
-            <p id="merchantCreatedAt" style="font-size: 16px; color: #666; text-align: center;">วันที่สร้าง: <span>2023-01-01</span></p>
-    
+            <h3 id="merchantName"
+                style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">
+                ชื่อร้านค้า</h3>
+            <p id="merchantEmail" style="font-size: 16px; color: #666; text-align: center; margin-bottom: 5px;">อีเมล์:
+                <span>email@example.com</span></p>
+            <p id="merchantCreatedAt" style="font-size: 16px; color: #666; text-align: center;">วันที่สร้าง:
+                <span>2023-01-01</span></p>
+
             <div class="modal-footer" style="text-align: center; margin-top: 20px;">
                 <button onclick="buyNow()"
                     class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -126,6 +137,11 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <div id="errorModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px;">
+        <p id="errorModalMessage"></p>
+        <button onclick="$('#errorModal').fadeOut();">ปิด</button>
     </div>
 
 </body>
@@ -241,6 +257,7 @@
         z-index: 9999;
         transition: opacity 0.3s ease-in-out;
     }
+
     .modal-content {
         background-color: #fff;
         padding: 30px;
@@ -251,6 +268,7 @@
         position: relative;
         text-align: center;
     }
+
     .close-btn {
         position: absolute;
         top: 10px;
@@ -262,11 +280,13 @@
         background: transparent;
         border: none;
     }
+
     .modal-footer button {
         font-size: 16px;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
+
     .modal-footer button:hover {
         background-color: #3b82f6;
     }
