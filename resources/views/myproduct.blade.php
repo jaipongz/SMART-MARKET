@@ -40,23 +40,31 @@
         <!-- Main Content -->
         <div class="w-full sm:w-5/6 bg-white p-6 ml-0 sm:ml-[16.67%] transition-all duration-300">
             <!-- Header -->
-            <div class="mb-6 flex items-center space-x-4">
-                <!-- รูปโปรไฟล์ร้านค้า -->
-                @if ($merchant->profile_pic)
-                    <img src="data:image/jpeg;base64,{{ $merchant->profile_pic }}" alt="Merchant Profile"
-                        class="w-16 h-16 object-cover rounded-full shadow">
-                @else
-                    <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
-                        📷
-                    </div>
-                @endif
+            <div
+                class="mb-6 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
+                <!-- รูปโปรไฟล์ร้านค้า (คลิกเพื่ออัปโหลด) -->
+                <label for="profilePicInput" class="cursor-pointer">
+                    @if ($merchant->profile_pic)
+                        <img id="profilePicPreview" src="data:image/jpeg;base64,{{ $merchant->profile_pic }}"
+                            alt="Merchant Profile" class="w-24 h-24 sm:w-16 sm:h-16 object-cover rounded-full shadow">
+                    @else
+                        <div id="profilePicPlaceholder"
+                            class="w-24 h-24 sm:w-16 sm:h-16 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                            📷
+                        </div>
+                    @endif
+                </label>
+
+                <!-- Input สำหรับอัปโหลดรูป (ซ่อนไว้) -->
+                <input type="file" id="profilePicInput" class="hidden" accept="image/*">
 
                 <!-- ข้อความต้อนรับ -->
                 <div>
-                    <h2 class="font-semibold text-3xl text-gray-800">สินค้าของคุณ</h2>
-                    <p class="mt-2 text-gray-600">ยินดีต้อนรับ {{ $merchant->name }}</p>
+                    <h2 class="font-semibold text-2xl sm:text-3xl text-gray-800 mt-2 sm:mt-0">สินค้าของคุณ</h2>
+                    <p class="mt-1 text-gray-600">ร้าน {{ $merchant->name }}</p>
                 </div>
             </div>
+
             <!-- ปุ่มเพิ่มสินค้า -->
             <div class="mb-6">
                 <a href="{{ route('merchantScan', [Auth::user()->id]) }}"
@@ -275,6 +283,60 @@
             sidebar.classList.add('-translate-x-full'); // ปิด sidebar
             overlay.classList.add('hidden'); // ปิด overlay
         });
+
+        document.getElementById('profilePicInput').addEventListener('change', function(event) {
+            previewProfilePic(event);
+            uploadProfilePic(event);
+        });
+
+        function previewProfilePic(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.getElementById('profilePicPreview');
+                    const placeholder = document.getElementById('profilePicPlaceholder');
+
+                    if (imgElement) {
+                        imgElement.src = e.target.result;
+                    } else {
+                        // ถ้าไม่มีรูปเดิม ให้สร้าง <img> มาแทน Placeholder
+                        const newImg = document.createElement('img');
+                        newImg.id = 'profilePicPreview';
+                        newImg.src = e.target.result;
+                        newImg.className = "w-24 h-24 sm:w-16 sm:h-16 object-cover rounded-full shadow";
+                        placeholder.replaceWith(newImg);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadProfilePic(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('profile_pic', file);
+            formData.append('merchant_id', {{ Auth::user()->id }});
+
+            fetch('/upload-merchant-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Profile picture uploaded:', data);
+                    // if (data.profile_pic) {
+                    //     document.getElementById('profilePicPreview').src = data.profile_pic;
+                    // }
+                })
+                .catch(error => console.error('Error uploading:', error));
+        }
     </script>
 
 

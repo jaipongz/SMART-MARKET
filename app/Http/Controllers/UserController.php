@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Products;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 class UserController extends Controller
 {
@@ -119,5 +120,37 @@ class UserController extends Controller
         }
         
         return response()->json($merchant);
+    }
+    
+    public function updateProfilepic(Request $request){
+        Log::debug('Request received:', $request->all());
+    
+        $merchant = User::where('id', $request->merchant_id)->firstOrFail();
+        Log::debug('Merchant found:', ['merchant_id' => $request->merchant_id, 'merchant' => $merchant]);
+    
+        if ($request->hasFile('profile_pic')) {
+            $image = $request->file('profile_pic');
+    
+            if ($image->isValid()) {
+                Log::debug('File uploaded:', ['file_name' => $image->getClientOriginalName(), 'file_size' => $image->getSize()]);
+    
+                $imageData = base64_encode(file_get_contents($image->getRealPath()));
+                Log::debug('Image data encoded to base64:', ['image_data' => substr($imageData, 0, 50)]);  // แสดงแค่ส่วนแรกของ base64 เพื่อไม่ให้ยาวเกินไป
+    
+                $merchant->profile_pic = $imageData;
+            } else {
+                Log::debug('Uploaded file is invalid');
+            }
+        } else {
+            Log::debug('No file uploaded');
+        }
+    
+        $merchant->save();
+        Log::debug('Profile picture saved for merchant:', ['merchant_id' => $merchant->id]);
+    
+        return response()->json([
+            'message' => 'Profile picture updated successfully',
+            'profile_pic' => $merchant->profile_pic,
+        ]);
     }
 }

@@ -13,6 +13,7 @@ Route::get('/', function () {
 });
 Route::get('/verify-store', [UserController::class, 'verifyStore'])->name('user.verify');
 Route::get('/get-merchant-info', [UserController::class, 'getMerchantInfo']);
+Route::post('/upload-merchant-profile', [UserController::class, 'updateProfilepic']);
 
 
 Route::get('/dashboard', function () {
