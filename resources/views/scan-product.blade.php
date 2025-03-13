@@ -14,7 +14,7 @@
     <script>
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
-
+        let maxQty = 1;
         $(document).ready(function() {
             initBarcodeScanner();
 
@@ -27,12 +27,9 @@
 
                 barcode.setHandler(function(barcode) {
                     if (!isScanning) return;
-
-                    $('#result').html('📦 บาร์โค้ด: ' + barcode);
                     playSound();
                     isScanning = false;
                     showProductDetail(barcode);
-                    // เปิดการสแกนใหม่หลังจาก 1.5 วินาที
                     setTimeout(function() {
                         isScanning = true;
                     }, 1500);
@@ -84,42 +81,86 @@
                     barcode: barcode
                 },
                 success: function(response) {
-                    console.log(response); // ตรวจสอบข้อมูลที่ได้รับจาก API
-
-                    // สมมุติว่า API ส่งข้อมูลสินค้าเป็น object
-                    const product = response.product; // สมมุติว่า API ส่งข้อมูลสินค้าในรูปแบบนี้
-
+                    console.log(response);
                     if (response.error) {
-                        alert(response.error); // ถ้ามีข้อผิดพลาด เช่น สินค้าหมด
+                        if (response.error === "sold_out") {
+                            showErrorModal('สินค้าในคลังหมด');
+                        } else if (response.error === "not_found") {
+                            showErrorModal('ไม่พบสินค้า');
+                        }
                         return;
                     }
-
-                    // ตั้งค่าข้อมูลสินค้าใน modal
+                    const product = response.product; // สมมุติว่า API ส่งข้อมูลสินค้าในรูปแบบนี้
+                    maxQty = product.amount;
                     $('#productImage').attr('src', 'data:image/jpeg;base64,' + product.image);
                     $('#productName').text(product.name);
-                    $('#productPrice').text(`ราคา: ฿${product.price.toFixed(2)}`);
+                    $('#productPrice').text(`ราคา: ฿${product.price}`);
                     $('#productQty').val(1); // ตั้งค่าเริ่มต้นเป็น 1 ชิ้น
 
                     // แสดง modal
                     $('#productModal').fadeIn();
                 },
                 error: function(error) {
-                    console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', error);
-                    alert('ไม่สามารถดึงข้อมูลสินค้าได้');
+                    console.error('REST Error:', error);
+                    try {
+                        const jsonError = JSON.parse(error.responseText);
+                        console.log('Parsed JSON Error:', jsonError);
+
+                        if (jsonError.error === "sold_out") {
+                            showErrorModal('สินค้าในคลังหมด');
+                        } else if (jsonError.error === "not_found") {
+                            showErrorModal('ไม่พบสินค้า');
+                        } else {
+                            showErrorModal('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า');
+                        }
+                    } catch (e) {
+                        console.log('JSON Parse Error:', e);
+                        showErrorModal('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า');
+                    }
                 }
             });
+        }
+
+        function showErrorModal(message) {
+            $('#errorModalMessage').text(message);
+            $('#errorModal').fadeIn();
+        }
+
+        function closeErrorModal() {
+            $('#errorModal').fadeOut();
         }
 
         function closeModal() {
             $('#productModal').fadeOut();
         }
 
+        // function changeQty(amount) {
+        //     let currentQty = parseInt($('#productQty').val()) || 1;
+        //     currentQty += amount;
+        //     if (currentQty < 1) currentQty = 1;
+        //     $('#productQty').val(currentQty);
+        // }
+
         function changeQty(amount) {
-            let currentQty = parseInt($('#productQty').val()) || 1;
-            currentQty += amount;
-            if (currentQty < 1) currentQty = 1;
-            $('#productQty').val(currentQty);
+            let qtyInput = document.getElementById("productQty");
+            let errorMsg = document.getElementById("errorMsg");
+
+            let currentQty = parseInt(qtyInput.value);
+
+            if (currentQty + amount > maxQty) {
+                errorMsg.style.display = "block"; // แสดงข้อความสีแดง
+                return;
+            } else {
+                errorMsg.style.display = "none"; // ซ่อนข้อความถ้าไม่มีปัญหา
+            }
+
+            // อัปเดตค่าจำนวน
+            let newQty = currentQty + amount;
+            if (newQty >= 1) {
+                qtyInput.value = newQty;
+            }
         }
+
 
         function addToCart() {
             const product = {
@@ -168,12 +209,23 @@
             <p id="productPrice">ราคา: ฿0.00</p>
             <div class="qty">
                 <button onclick="changeQty(-1)">➖</button>
-                <input type="number" id="productQty" value="1" min="1">
+                <input type="number" id="productQty" value="1" min="1" readonly>
                 <button onclick="changeQty(1)">➕</button>
             </div>
+            <p id="errorMsg" style="color: red; display: none;">ถึงจำนวนสูงสุดในคลังแล้ว</p>
             <div class="modal-footer">
                 <button onclick="addToCart()">🛒 เพิ่มลงตะกร้า</button>
             </div>
+        </div>
+    </div>
+
+    <div id="errorModal" style="display:none;" class="modal">
+        <div class="modal-content  mx-4">
+            <span class="close-btn" onclick="closeErrorModal()">✖</span>
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle" style=""></i> <!-- ใช้ FontAwesome -->
+            </div>
+            <p style="margin: 30px 0 20px" id="errorModalMessage">ไม่พบข้อมูลร้านค้า</p>
         </div>
     </div>
 </body>
@@ -282,50 +334,103 @@
     }
 
     .modal {
+        display: none;
+        /* เริ่มซ่อน */
         position: fixed;
+        z-index: 1000;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 9999;
-        transition: opacity 0.3s ease-in-out;
+        font-family: 'Kanit', sans-serif;
+        overflow: hidden;
     }
 
     .modal-content {
         background-color: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        width: 400px;
-        max-width: 100%;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        position: relative;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
         text-align: center;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border-radius: 8px;
+    }
+
+    .modal h3 {
+        margin: 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .modal p {
+        font-size: 16px;
+        color: #555;
+        margin: 10px 0;
+    }
+
+    .qty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin: 15px 0;
+    }
+
+    .qty button {
+        padding: 5px 15px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        background: #007bff;
+        color: white;
+        border-radius: 6px;
+    }
+
+    .qty button:hover {
+        background: #0056b3;
+    }
+
+    .qty input {
+        width: 50px;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .modal-footer button {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .modal-footer button:hover {
+        background: #218838;
     }
 
     .close-btn {
         position: absolute;
         top: 10px;
-        right: 10px;
-        font-size: 24px;
-        font-weight: bold;
+        right: 15px;
+        cursor: pointer;
+        font-size: 18px;
         color: #333;
-        cursor: pointer;
-        background: transparent;
-        border: none;
-    }
-
-    .modal-footer button {
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .modal-footer button:hover {
-        background-color: #3b82f6;
     }
 </style>
 

@@ -181,20 +181,20 @@ class UserController extends Controller
             // เช็คจำนวนสินค้า
             if ($product->amount <= 0) {
                 return response()->json([
-                    'error' => 'สินค้าหมด'
+                    'error' => 'sold_out'
                 ], 404);
             }
 
             return response()->json([
                 'product' => [
-                    'name' => $product->name,
+                    'name' => $product->product_name,
                     'price' => $product->price,
                     'image' => $product->product_pic, // base64
                     'amount' => $product->amount
                 ]
             ]);
         } else {
-            return response()->json(['error' => 'ไม่พบข้อมูลสินค้า'], 404);
+            return response()->json(['error' => 'not_found'], 404);
         }
     }
 
