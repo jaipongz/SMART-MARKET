@@ -187,6 +187,9 @@ class UserController extends Controller
 
             return response()->json([
                 'product' => [
+
+                    'product_id' => $product->product_id,
+                    'merchant_id' => $product->merchant_id,
                     'name' => $product->product_name,
                     'price' => $product->price,
                     'image' => $product->product_pic, // base64

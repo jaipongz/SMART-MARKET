@@ -15,6 +15,9 @@
         var sound = new Audio("https://pirate-town.manga208.com/public/assets/js/barcode.wav");
         var isScanning = true;
         let maxQty = 1;
+        let merchantId;
+        let productId;
+        let producPic;
         $(document).ready(function() {
             initBarcodeScanner();
 
@@ -66,7 +69,7 @@
 
         function showProductDetail(barcode) {
             // ดึง merchantId จาก query parameter หรือจากตัวแปรที่เก็บไว้
-            const merchantId = new URLSearchParams(window.location.search).get('id'); // ถ้าค่ามาจาก URL
+            merchantId = new URLSearchParams(window.location.search).get('id'); // ถ้าค่ามาจาก URL
             if (!merchantId) {
                 console.error('ไม่พบ merchantId');
                 return;
@@ -92,6 +95,8 @@
                     }
                     const product = response.product; // สมมุติว่า API ส่งข้อมูลสินค้าในรูปแบบนี้
                     maxQty = product.amount;
+                    productId = product.product_id;
+                    producPic = product.image;
                     $('#productImage').attr('src', 'data:image/jpeg;base64,' + product.image);
                     $('#productName').text(product.name);
                     $('#productPrice').text(`ราคา: ฿${product.price}`);
@@ -164,15 +169,28 @@
 
         function addToCart() {
             const product = {
+                product_pic:producPic,
+                product_stock:maxQty,
+                produc_id: productId,
+                merchant_id: merchantId,
                 name: $('#productName').text(),
                 price: parseFloat($('#productPrice').text().replace('ราคา: ฿', '')),
                 qty: parseInt($('#productQty').val())
             };
 
             console.log('📦 เพิ่มลงตะกร้า:', product);
-            alert(`${product.name} จำนวน ${product.qty} ชิ้น ถูกเพิ่มลงตะกร้าแล้ว!`);
 
+            // เก็บข้อมูลลง localStorage (ใช้ JSON.stringify เพื่อแปลงเป็น String)
+            let cart = JSON.parse(localStorage.getItem('cart')) || []; // ถ้ายังไม่มีตะกร้าให้เริ่มต้นเป็น array เปล่า
+            cart.push(product); // เพิ่มสินค้าลงตะกร้า
+            localStorage.setItem('cart', JSON.stringify(cart)); // เก็บข้อมูลลง localStorage
+
+            alert(`${product.name} จำนวน ${product.qty} ชิ้น ถูกเพิ่มลงตะกร้าแล้ว!`);
             closeModal();
+        }
+
+        function goToCart() {
+            window.location.href = '/cart'; // สมมุติว่า URL ของหน้าตะกร้าสินค้าเป็น "/cart"
         }
     </script>
 </head>
@@ -193,8 +211,8 @@
         </div>
 
         <div id="result">
-            <button id="generateBarcode"
-                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 ml-4">ตะกร้าสินค้า</button>
+            <button id="generateBarcode" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 ml-4"
+                onclick="goToCart()">ตะกร้าสินค้า</button>
         </div>
 
         <!-- canvas ซ่อนประมวลผล -->
