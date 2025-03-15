@@ -223,8 +223,10 @@
             <h2>Barcode ของร้านค้าของคุณ</h2>
             <svg id="Mybarcode"></svg>
             <div class="mt-4">
+                <button id="downloadBarcode"
+                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">ดาวน์โหลด</button>
                 <button id="closeBarModal"
-                    class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700">ปิด</button>
+                    class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700" onclick="closeModal()">ปิด</button>
             </div>
         </div>
     </div>
@@ -309,6 +311,7 @@
             }
 
             const orderId = generateOrderId();
+            console.log(orderId);
 
             // Prepare the data to be sent to the storeOrder API
             const orderData = {
@@ -321,6 +324,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify(orderData),
                 })
@@ -336,8 +340,8 @@
 
                         localStorage.removeItem('cart');
 
-                        alert("การซื้อเสร็จสิ้น!");
-                        window.location.href = '/'; // Redirect to another page or reload the page
+                        // alert("การซื้อเสร็จสิ้น!");
+                        // window.location.href = '/'; // Redirect to another page or reload the page
                     } else {
                         alert("เกิดข้อผิดพลาดในการยืนยันการซื้อ");
                     }
@@ -350,7 +354,12 @@
         }
 
         function generateOrderId() {
-            return Math.floor(Math.random() * 1000000000000).toString().padStart(13, '0');
+            let orderId;
+            do {
+                orderId = Math.floor(Math.random() * 1000000000000).toString();
+            } while (orderId.startsWith('0')); // ตรวจสอบว่าขึ้นต้นด้วย '0' หรือไม่
+
+            return orderId;
         }
 
         function generateBarcode(orderId) {
@@ -374,6 +383,35 @@
             const modal = document.getElementById('barcodeModal');
             modal.style.display = 'none';
         }
+
+        document.getElementById('downloadBarcode').addEventListener('click', function() {
+            const svg = document.getElementById('Mybarcode');
+
+            // แปลง SVG เป็น Data URL (PNG)
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            const svgBlob = new Blob([svgData], {
+                type: 'image/svg+xml;charset=utf-8'
+            });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+
+                // สร้างลิงก์ดาวน์โหลด
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'barcode.png';
+                link.click();
+            };
+
+            img.src = url;
+        });
     </script>
 
 </body>

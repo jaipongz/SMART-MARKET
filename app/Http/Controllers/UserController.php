@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Products;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 class UserController extends Controller
@@ -200,5 +202,75 @@ class UserController extends Controller
             return response()->json(['error' => 'not_found'], 404);
         }
     }
+
+    public function createOrder(Request $request)
+    {
+        // Log::debug('📌 Request Received:', $request->all());
+
+        try {
+            $orderId = $request->input('orderId');
+            $cartItems = $request->input('cart');
+
+            // ตรวจสอบว่า cart มีข้อมูลหรือไม่
+            if (!$cartItems || !is_array($cartItems) || count($cartItems) === 0) {
+                Log::error('❌ Cart is empty or invalid', ['cart' => $cartItems]);
+                return response()->json(['success' => false, 'message' => 'Cart is empty'], 400);
+            }
+
+            $merchantId = $cartItems[0]['merchant_id'] ?? null;
+
+            // ตรวจสอบ merchant_id
+            if (!$merchantId) {
+                Log::error('❌ Missing merchant_id in cart', ['cart' => $cartItems]);
+                return response()->json(['success' => false, 'message' => 'Merchant ID is missing'], 400);
+            }
+
+            // คำนวณราคารวม
+            $totalPrice = collect($cartItems)->sum(function ($item) {
+                return ($item['price'] ?? 0) * ($item['qty'] ?? 0);
+            });
+
+            Log::debug('🛒 Total Price Calculated:', ['total_price' => $totalPrice]);
+
+            // บันทึก Order
+            $order = Order::create([
+                'order_id' => $orderId,
+                'merchant_id' => $merchantId,
+                'total_price' => $totalPrice,
+                'order_status' => 'pending',
+            ]);
+
+            Log::info('✅ Order Created:', ['order_id' => $order->id]);
+
+            // บันทึก Order Items
+            foreach ($cartItems as $item) {
+                if (!isset($item['produc_id'], $item['name'], $item['price'], $item['qty'])) {
+                    Log::error('❌ Missing required product fields', ['item' => $item]);
+                    continue;
+                }
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['produc_id'], // ✅ แก้ไขจาก produc_id -> product_id
+                    'name' => $item['name'],
+                    'price' => $item['price'],
+                    'qty' => $item['qty'],
+                    'subtotal' => $item['price'] * $item['qty'],
+                ]);
+
+                Log::info('🛍 Order Item Created:', ['product_id' => $item['produc_id']]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order created successfully!',
+                'order_id' => $orderId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('🚨 Internal Server Error:', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Internal Server Error'], 500);
+        }
+    }
+
 
 }
