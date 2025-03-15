@@ -73,15 +73,18 @@
                             <tr class="border-b">
                                 <td class="py-2 px-4 text-left">{{ $order->order_id }}</td>
                                 <td class="py-2 px-4 text-left">{{ $order->total_price }}</td>
-                                <td class="py-2 px-4 text-left">
-                                    @if ($order->order_status == 'success')
-                                        <span class="bg-green-200 text-green-800 px-2 py-1 rounded-full">กำลังดำเนินการ</span>
+                                <td class="py-2 px-4 text-left ">
+                                    @if ($order->order_status == 'completed')
+                                        <span
+                                            class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">กำลังดำเนินการ</span>
                                     @elseif ($order->order_status == 'pending')
-                                        <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">เสร็จสิ้น</span>
-                                    @elseif ($order->order_status == 'cancel')
+                                        <span
+                                            class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">เสร็จสิ้น</span>
+                                    @elseif ($order->order_status == 'canceled')
                                         <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ยกเลิก</span>
                                     @else
-                                        <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ไม่ทราบสถานะ</span>
+                                        <span
+                                            class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ไม่ทราบสถานะ</span>
                                     @endif
                                 </td>
                                 <td class="py-2 px-4 text-left">{{ $order->created_at }}</td>
@@ -91,12 +94,15 @@
                                         class="text-yellow-500 hover:text-yellow-700">
                                         แก้ไข
                                     </button> --}}
-                                    <form action="" method="POST" {{-- <form action="{{ route('product.destroy', ['id' => $item->id]) }}" method="POST" --}}
-                                        onsubmit="return confirm('Are you sure you want to delete this product?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-700 ml-4">ยกเลิก</button>
-                                    </form>
+                                    @if ($order->order_status == 'pending')
+                                        <form action="" method="POST" {{-- <form action="{{ route('product.destroy', ['id' => $item->id]) }}" method="POST" --}}
+                                            onsubmit="return confirm('Are you sure you want to delete this product?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="text-red-500 hover:text-red-700 ml-4">ยกเลิก</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -105,43 +111,44 @@
 
                 <!-- มือถือ: Card -->
                 <div class="sm:hidden space-y-4">
-                    {{-- @foreach ($products as $item)
+                    @foreach ($orders as $order)
                         <div class="bg-white border border-gray-200 shadow-md rounded-lg p-4 flex flex-col">
                             <div class="flex items-center space-x-4">
-                                <!-- รูปภาพ -->
-                                @if ($item->product_pic)
-                                    <img src="data:image/jpeg;base64,{{ $item->product_pic }}" alt="Product Image"
-                                        class="w-24 h-24 object-cover rounded-lg border border-gray-300 shadow-sm">
-                                @else
-                                    <div
-                                        class="w-24 h-24 bg-gray-200 flex items-center justify-center rounded-lg border border-gray-300">
-                                        <span class="text-gray-500">No Image</span>
-                                    </div>
-                                @endif
-                                <!-- ข้อมูลสินค้า -->
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-lg text-gray-800">{{ $item->product_name }}</h3>
-                                    <p class="text-gray-600">จำนวน: {{ $item->amount }}</p>
-                                    <p class="text-gray-600">ราคา: {{ $item->price }} บาท</p>
-                                    <p class="text-gray-500 text-sm">วันที่: {{ $item->created_at }}</p>
+                                    <h3 class="font-semibold text-lg text-gray-800">{{ $order->order_id }}</h3>
+                                    <p class="text-gray-600">ราคา: {{ $order->total_price }} บาท</p>
+                                    <p class="text-gray-600">สถานะ: @if ($order->order_status == 'completed')
+                                            <span
+                                                class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">กำลังดำเนินการ</span>
+                                        @elseif ($order->order_status == 'pending')
+                                            <span
+                                                class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">เสร็จสิ้น</span>
+                                        @elseif ($order->order_status == 'canceled')
+                                            <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ยกเลิก</span>
+                                        @else
+                                            <span
+                                                class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ไม่ทราบสถานะ</span>
+                                        @endif
+                                    </p>
+                                    <p class="text-gray-500 text-sm">วันที่: {{ $order->created_at }}</p>
                                 </div>
                             </div>
                             <!-- ปุ่มแก้ไข & ลบ -->
                             <div class="mt-4 flex justify-end space-x-4">
-                                <button
+                                {{-- <button
                                     onclick="editProduct('{{ $item->id }}', '{{ $item->product_name }}', '{{ $item->amount }}', '{{ $item->price }}', '{{ $item->product_pic }}')"
                                     class="text-yellow-500 hover:text-yellow-700">
                                     แก้ไข
-                                </button>
-                                <form action="{{ route('product.destroy', ['id' => $item->id]) }}" method="POST"
+                                </button> --}}
+                                <form action="" method="POST"
                                     onsubmit="return confirm('Are you sure you want to delete this product?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700">ลบ</button>
+                                    <button type="submit" class="text-red-500 hover:text-red-700">ยกเลิก</button>
                                 </form>
                             </div>
                         </div>
-                    @endforeach --}}
+                    @endforeach
                 </div>
             </div>
 
