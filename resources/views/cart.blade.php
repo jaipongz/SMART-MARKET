@@ -7,8 +7,16 @@
     <title>ตะกร้าสินค้า</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        .modal-icon i {
+            font-size: 120px;
+            color: rgb(255, 70, 70)
+                /* ปรับขนาดได้ตามต้องการ */
+        }
+
         .cart-item {
             display: flex;
             align-items: center;
@@ -132,7 +140,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* display: flex; */
+            display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Kanit', sans-serif;
@@ -140,14 +148,35 @@
         }
 
         .modal-content {
-            background: #fff;
+            background-color: #fff;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             width: 90%;
             max-width: 400px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .modal h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .modal p {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
         }
 
         .close-btn {
@@ -155,38 +184,8 @@
             top: 10px;
             right: 15px;
             cursor: pointer;
-            font-size: 20px;
-        }
-
-        .modal-content label {
-            display: block;
-            text-align: left;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        .modal-content input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            display: block;
-        }
-
-        .modal-content button {
-            background: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .modal-content button:hover {
-            background: #218838;
+            font-size: 18px;
+            color: #333;
         }
 
         #Mybarcode {
@@ -218,16 +217,25 @@
             </button>
         </div>
     </div>
-    <div id="barcodeModal" class="modal">
+    <div id="barcodeModal" style="display:none;" class="modal">
         <div class="modal-content">
             <h2>Barcode ของร้านค้าของคุณ</h2>
             <svg id="Mybarcode"></svg>
             <div class="mt-4">
                 <button id="downloadBarcode"
                     class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">ดาวน์โหลด</button>
-                <button id="closeBarModal"
-                    class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700" onclick="closeModal()">ปิด</button>
+                <button id="closeBarModal" class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700"
+                    onclick="closeModal()">ปิด</button>
             </div>
+        </div>
+    </div>
+    <div id="errorModal" style="display:none;" class="modal">
+        <div class="modal-content  mx-4">
+            <span class="close-btn" onclick="closeErrorModal()">✖</span>
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle" style=""></i> <!-- ใช้ FontAwesome -->
+            </div>
+            <p style="margin: 30px 0 20px" id="errorModalMessage">ไม่พบข้อมูลร้านค้า</p>
         </div>
     </div>
     <script>
@@ -261,6 +269,15 @@
                 cartItemsContainer.innerHTML = cartHTML;
             }
         });
+
+        function showErrorModal(message) {
+            $('#errorModalMessage').text(message);
+            $('#errorModal').fadeIn();
+        }
+
+        function closeErrorModal() {
+            $('#errorModal').fadeOut();
+        }
 
         // ฟังก์ชันการเพิ่มหรือลดจำนวนสินค้า
         function changeQty(index, change) {
@@ -306,7 +323,7 @@
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
             if (cart.length === 0) {
-                alert("ตะกร้าสินค้าว่าง");
+                showErrorModal("ตะกร้าสินค้าว่าง");
                 return;
             }
 
@@ -343,12 +360,12 @@
                         // alert("การซื้อเสร็จสิ้น!");
                         // window.location.href = '/'; // Redirect to another page or reload the page
                     } else {
-                        alert("เกิดข้อผิดพลาดในการยืนยันการซื้อ");
+                        showErrorModal("เกิดข้อผิดพลาดในการยืนยันการซื้อ");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+                    showErrorModal("เกิดข้อผิดพลาดในการเชื่อมต่อ");
                 });
 
         }
@@ -406,7 +423,10 @@
                 // สร้างลิงก์ดาวน์โหลด
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
-                link.download = 'barcode.png';
+                const now = new Date();
+                const datetime = now.toISOString().replace(/T/, '_').replace(/\..+/,
+                ''); 
+                link.download = `barcode-${datetime}.png`;
                 link.click();
             };
 

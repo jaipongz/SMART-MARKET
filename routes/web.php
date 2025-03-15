@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/products', [UserController::class, 'update'])->name('product.update');
     Route::delete('/product/{id}', [UserController::class, 'destroy'])->name('product.destroy');
     Route::get('/merchant/home', [UserController::class, 'welcome'])->name('merchant.welcome');
+    Route::get('/orders{merchantId}', [UserController::class, 'getOrdersByMerchantId'])->name('merchant.order');
 });
 
 

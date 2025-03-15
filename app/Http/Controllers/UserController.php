@@ -272,5 +272,25 @@ class UserController extends Controller
         }
     }
 
+    public function getOrdersByMerchantId($merchantId)
+    {
+        if (!$merchantId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Merchant ID is required',
+            ], 400);
+        }
+        $orders = Order::where('merchant_id', $merchantId)
+            ->latest() // เรียงลำดับจากออร์เดอร์ล่าสุด
+            ->limit(15) // จำกัดผลลัพธ์ 15 ออร์เดอร์
+            ->get(); // ดึงข้อมูลทั้งหมด
+        // dd($orders);
+        $user = DB::table('users')
+            ->where('id', $merchantId)
+            ->select('id', 'name', 'email', 'profile_pic', 'created_at')
+            ->first(); // Use first() since it should return one row
+        return view('myOrdes', ['orders' => $orders, 'merchant' => $user]);
+    }
+
 
 }
