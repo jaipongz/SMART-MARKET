@@ -76,10 +76,10 @@
                                 <td class="py-2 px-4 text-left ">
                                     @if ($order->order_status == 'completed')
                                         <span
-                                            class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">กำลังดำเนินการ</span>
+                                            class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">เสร็จสิ้น</span>
                                     @elseif ($order->order_status == 'pending')
                                         <span
-                                            class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">เสร็จสิ้น</span>
+                                            class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">กำลังดำเนินการ</span>
                                     @elseif ($order->order_status == 'canceled')
                                         <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ยกเลิก</span>
                                     @else
@@ -119,10 +119,10 @@
                                     <p class="text-gray-600">ราคา: {{ $order->total_price }} บาท</p>
                                     <p class="text-gray-600">สถานะ: @if ($order->order_status == 'completed')
                                             <span
-                                                class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">กำลังดำเนินการ</span>
+                                                class="bg-green-200 text-green-800 px-2 py-1 rounded-full ">เสร็จสิ้น</span>
                                         @elseif ($order->order_status == 'pending')
                                             <span
-                                                class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">เสร็จสิ้น</span>
+                                                class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">กำลังดำเนินการ</span>
                                         @elseif ($order->order_status == 'canceled')
                                             <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full">ยกเลิก</span>
                                         @else
