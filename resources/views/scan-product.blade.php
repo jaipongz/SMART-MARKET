@@ -49,7 +49,7 @@
         });
 
         function goBack() {
-            window.location.href = '../index.html'; // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
+            window.history.back();  // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
         }
         // function showProductDetail(barcode) {
         // 	// ตัวอย่างข้อมูลสินค้า (จริงๆควรดึงจากระบบหรือ API ตามบาร์โค้ดที่ได้มา)
