@@ -5,9 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js" defer></script>
 </head>
+<style>
+
+</style>
 
 <body class="bg-gray-100">
 
@@ -90,9 +94,13 @@
                                 <td class="py-2 px-4 text-left">{{ $item->amount }}</td>
                                 <td class="py-2 px-4 text-left">{{ $item->price }}</td>
                                 <td class="py-2 px-4 text-left">{{ $item->created_at }}</td>
-                                <td class="py-2 px-4 text-left">
+                                <td class="py-2 px-4 text-left gap-2">
+                                    <button class="text-green-500 hover:text-green-700"
+                                        onclick="showModal('{{ $item->product_id }}','{{$item->product_name}}')">ดูบาร์โค้ด</button>
                                     <button
-                                        onclick="editProduct('{{ $item->id }}', '{{ $item->product_name }}', '{{ $item->amount }}', '{{ $item->price }}', '{{ $item->product_pic }}')"
+                                        onclick="editProduct('{{ $item->id }}', '{{ $item->product_name }}'
+                                        , '{{ $item->amount }}' , '{{ $item->price }}' , '{{ $item->product_pic }}'
+                                        )"
                                         class="text-yellow-500 hover:text-yellow-700">
                                         แก้ไข
                                     </button>
@@ -221,33 +229,34 @@
     <div id="editModal" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 hidden">
         <div class="bg-white p-6 rounded-lg w-96">
             <h3 class="text-2xl font-semibold text-gray-800 mb-4">แก้ไขสินค้า</h3>
+
             <form id="editForm" method="POST"
                 action="{{ route('product.update') }} "enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-                <input type="hidden" id="productId" name="product_id">
+                <input type="hidden" id="productEditId" name="product_id">
                 <div class="mb-4 text-center">
                     <!-- รูปภาพสินค้า -->
-                    <label for="productImageInput">
-                        <img id="productImage" src="" alt="Product Image"
+                    <label for="productEditImageInput">
+                        <img id="productEditImage" src="" alt="Product Image"
                             class="w-32 h-32 object-cover rounded mx-auto cursor-pointer hidden">
                     </label>
-                    <input type="file" name="product_pic" id="productImageInput" accept="image/*" class="hidden"
-                        onchange="previewImage(event)">
+                    <input type="file" name="product_pic" id="productEditImageInput" accept="image/*"
+                        class="hidden" onchange="previewImage(event)">
                 </div>
                 <div class="mb-4">
-                    <label for="productName" class="block text-gray-700">ชื่อสินค้า</label>
-                    <input type="text" name="product_name" id="productName"
+                    <label for="productEditName" class="block text-gray-700">ชื่อสินค้า</label>
+                    <input type="text" name="product_name" id="productEditName"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 <div class="mb-4">
-                    <label for="productQuantity" class="block text-gray-700">จำนวน</label>
-                    <input type="number" name="product_amount" id="productQuantity"
+                    <label for="productEditQuantity" class="block text-gray-700">จำนวน</label>
+                    <input type="number" name="product_amount" id="productEditQuantity"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 <div class="mb-4">
-                    <label for="productPrice" class="block text-gray-700">ราคา</label>
-                    <input type="number" name="product_price" id="productPrice"
+                    <label for="productEditPrice" class="block text-gray-700">ราคา</label>
+                    <input type="number" name="product_price" id="productEditPrice"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 <div class="flex justify-end">
@@ -257,6 +266,20 @@
                         class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">บันทึกการเปลี่ยนแปลง</button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div id="barcodeModal" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-96">
+            <h3 id="barcodeName" class="text-2xl font-semibold text-gray-800 mb-4">รหัส</h3>
+
+            <svg id="Mybarcode" class="w-full h-32 mb-4"></svg>
+
+            <div class="flex justify-end">
+                <span onclick="closeModal()"
+                    class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 cursor-pointer">ปิด</span>
+                <button id="downloadBarcode"
+                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">ดาวน์โหลด</button>
+            </div>
         </div>
     </div>
 
@@ -296,12 +319,13 @@
 
         // ฟังก์ชัน Edit Product (เติมค่าลงใน Modal)
         function editProduct(id, name, quantity, price, image) {
-            document.getElementById('productId').value = id;
-            document.getElementById('productName').value = name;
-            document.getElementById('productQuantity').value = quantity;
-            document.getElementById('productPrice').value = price;
 
-            let imgElement = document.getElementById('productImage');
+            document.getElementById('productEditId').value = id;
+            document.getElementById('productEditName').value = name;
+            document.getElementById('productEditQuantity').value = quantity;
+            document.getElementById('productEditPrice').value = price;
+
+            let imgElement = document.getElementById('productEditImage');
 
             if (image) {
                 imgElement.src = "data:image/jpeg;base64," + image;
@@ -319,8 +343,8 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('productImage').src = e.target.result;
-                    document.getElementById('productImage').classList.remove('hidden');
+                    document.getElementById('productEditImage').src = e.target.result;
+                    document.getElementById('productEditImage').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
             }
@@ -400,6 +424,63 @@
                 })
                 .catch(error => console.error('Error uploading:', error));
         }
+
+
+        // Show the modal
+        function showModal(productId,productName) {
+            const modal = document.getElementById('barcodeModal');
+            document.getElementById('barcodeName').textContent = `Barcode ${productName}`;
+            modal.style.display = 'flex';
+            generateBarcode(productId); // Generate the barcode when the modal opens
+        }
+
+        // Close the modal
+        function closeModal() {
+            const modal = document.getElementById('barcodeModal');
+            modal.style.display = 'none';
+        }
+
+        // Generate the barcode using JsBarcode
+        function generateBarcode(productId) {
+            JsBarcode("#Mybarcode", productId, {
+                format: "EAN13", // Barcode format (you can choose different formats)
+                lineColor: "#000000", // Barcode line color
+                width: 4, // Width of each barcode line
+                height: 100, // Height of the barcode
+                displayValue: true, // Show the barcode number under the barcode
+                fontSize: 18, // Font size of the displayed value
+            });
+        }
+
+        // Download the barcode as an image
+        document.getElementById('downloadBarcode').addEventListener('click', function() {
+            const svg = document.getElementById('Mybarcode');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            const svgBlob = new Blob([svgData], {
+                type: 'image/svg+xml;charset=utf-8'
+            });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+
+                // Create a download link
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                const now = new Date();
+                const datetime = now.toISOString().replace(/T/, '_').replace(/\..+/, '');
+                link.download = `barcode-${datetime}.png`;
+                link.click();
+            };
+
+            img.src = url;
+        });
     </script>
 
 

@@ -16,8 +16,8 @@
         <li>
             <a href="{{route('merchant.order',[Auth::user()->id])}}" class="text-lg hover:text-gray-300">คำสั่งซื้อ</a>
         </li>
-        <li>
+        {{-- <li>
             <a href="{{route('merchant.order',[Auth::user()->id])}}" class="text-lg hover:text-gray-300">ประวัติการขาย</a>
-        </li>
+        </li> --}}
     </ul>
 </div>

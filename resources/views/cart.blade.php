@@ -381,6 +381,16 @@
             return orderId + checkDigit;
         }
 
+        function calculateEAN13CheckDigit(orderId) {
+            let sum = 0;
+            for (let i = 0; i < orderId.length; i++) {
+                let num = parseInt(orderId[i]);
+                sum += (i % 2 === 0) ? num : num * 3;
+            }
+            let checkDigit = (10 - (sum % 10)) % 10;
+            return checkDigit.toString();
+        }
+
         function generateBarcode(orderId) {
             console.log('Ongen --->', orderId);
 
@@ -394,15 +404,7 @@
             });
         }
 
-        function calculateEAN13CheckDigit(orderId) {
-            let sum = 0;
-            for (let i = 0; i < orderId.length; i++) {
-                let num = parseInt(orderId[i]);
-                sum += (i % 2 === 0) ? num : num * 3;
-            }
-            let checkDigit = (10 - (sum % 10)) % 10;
-            return checkDigit.toString();
-        }
+       
 
         function showModal() {
             const modal = document.getElementById('barcodeModal');

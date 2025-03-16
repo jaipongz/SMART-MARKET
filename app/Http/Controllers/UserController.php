@@ -58,13 +58,10 @@ class UserController extends Controller
         //     'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         // ]);
 
-        // Debug เช็คค่าที่ส่งมาทั้งหมด
         // dd($request->all());
         if (!$request->has('barcode')) {
-            // If barcode doesn't exist, generate a new 13-digit barcode
-            $barcode = '855' . str_pad(rand(0, 9999999999), 10, '0', STR_PAD_LEFT); // Generates a 10-digit random number and prepends 855
+            $barcode = $this->generateBarcode();
         } else {
-            // If barcode exists in the request, use the provided barcode
             $barcode = $request->barcode;
         }
 
@@ -78,7 +75,7 @@ class UserController extends Controller
 
         // บันทึกสินค้า
         Products::create([
-            'product_id' =>  $barcode, // ใช้ barcode เป็น product_id
+            'product_id' => $barcode, // ใช้ barcode เป็น product_id
             'merchant_id' => $request->merchantId,
             'product_name' => $request->name,
             'product_pic' => $imageBase64, // เก็บ Base64
@@ -87,6 +84,40 @@ class UserController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'เพิ่มสินค้าสำเร็จ!');
+    }
+    public function generateBarcode()
+    {
+        // Step 1: Generate a random 12-digit order ID that doesn't start with 0
+        do {
+            $orderId = rand(100000000000, 999999999999);  // Generates a 12-digit number
+        } while (substr($orderId, 0, 1) === '0');  // Check that it doesn't start with '0'
+
+        // Step 2: Calculate the EAN-13 check digit
+        $checkDigit = $this->calculateEAN13CheckDigit($orderId);
+
+        // Step 3: Prepend '855' to the order ID and append the check digit
+        $barcode = $orderId . $checkDigit;
+        return $barcode;
+    }
+
+    private function calculateEAN13CheckDigit($orderId)
+    {
+        $sum = 0;
+        $orderId = str_split($orderId);  // Convert the order ID to an array of digits
+
+        for ($i = 0; $i < count($orderId); $i++) {
+            $num = (int) $orderId[$i];
+            // Apply the EAN-13 weighting (odd index * 3 and even index * 1)
+            if ($i % 2 === 0) {
+                $sum += $num;  // Even index (0-based) - no multiplication
+            } else {
+                $sum += $num * 3;  // Odd index (0-based) - multiply by 3
+            }
+        }
+
+        // Calculate the check digit (mod 10)
+        $checkDigit = (10 - ($sum % 10)) % 10;
+        return $checkDigit;
     }
 
     public function update(Request $request)
@@ -385,7 +416,8 @@ class UserController extends Controller
         ]);
     }
 
-    public function cancelOrder($id){
+    public function cancelOrder($id)
+    {
         $order = Order::where('order_id', $id)->first();
         $order->order_status = "canceled";
         $order->save();
