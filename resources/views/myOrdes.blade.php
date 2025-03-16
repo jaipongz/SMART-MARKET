@@ -95,10 +95,11 @@
                                         แก้ไข
                                     </button> --}}
                                     @if ($order->order_status == 'pending')
-                                        <form action="" method="POST" {{-- <form action="{{ route('product.destroy', ['id' => $item->id]) }}" method="POST" --}}
+                                        {{-- <form action="" method="POST"  --}}
+                                        <form action="{{ route('order.cancel', ['id' => $order->order_id]) }}" method="POST"
                                             onsubmit="return confirm('Are you sure you want to delete this product?')">
                                             @csrf
-                                            @method('DELETE')
+                                            @method('PUT')
                                             <button type="submit"
                                                 class="text-red-500 hover:text-red-700 ml-4">ยกเลิก</button>
                                         </form>

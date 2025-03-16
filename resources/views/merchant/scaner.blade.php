@@ -255,7 +255,7 @@
                     onchange="previewImage(event)">
                 <img id="productImagePreview" src="" style="display:none;">
 
-                <button type="submit">💾 บันทึกสินค้า</button>
+                <button type="submit">บันทึกสินค้า</button>
             </form>
         </div>
     </div>

@@ -17,7 +17,7 @@
         <!-- Sidebar -->
         @include('layouts.aside')
         <!-- Sidebar -->
-        
+
 
         <!-- Main Content -->
         <div class="w-full sm:w-5/6 bg-white p-6 ml-0 sm:ml-[16.67%] transition-all duration-300">
@@ -48,11 +48,15 @@
             </div>
 
             <!-- ปุ่มเพิ่มสินค้า -->
-            <div class="mb-6">
+            <div class="mb-6 flex flex-col gap-2 md:flex-row md:gap-4">
                 <a href="{{ route('merchantScan', [Auth::user()->id]) }}"
-                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
                     เพิ่มสินค้า
                 </a>
+                <button id="openModalBtn" onclick="openCreateModal()"
+                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    เพิ่มสินค้าที่ไม่มีบาร์โค้ด
+                </button>
             </div>
 
             <!-- ตารางสินค้า -->
@@ -159,12 +163,66 @@
             </div>
         </div>
     </div>
+    <div id="productModal" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-96">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">เพิ่มสินค้า</h3>
+            <form method="POST" action="{{ route('product.store') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="text" style="display: none" id="merchantId" name="merchantId"
+                    value="{{ Auth::user()->id }}">
 
+                <!-- รหัสสินค้า -->
+                {{-- <div class="mb-4">
+                    <label for="productCode" class="block text-gray-700">รหัสสินค้า:</label>
+                    <input type="text" id="productCode" name="barcode" readonly
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div> --}}
+
+                <!-- ชื่อสินค้า -->
+                <div class="mb-4">
+                    <label for="productName" class="block text-gray-700">ชื่อสินค้า:</label>
+                    <input type="text" id="productName" name="name" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+
+                <!-- ราคา -->
+                <div class="mb-4">
+                    <label for="productPrice" class="block text-gray-700">ราคา (บาท):</label>
+                    <input type="number" id="productPrice" name="price" min="0" step="0.01" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+
+                <!-- จำนวนในคลัง -->
+                <div class="mb-4">
+                    <label for="productStock" class="block text-gray-700">จำนวนในคลัง:</label>
+                    <input type="number" id="productStock" name="stock" min="0" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+
+                <!-- อัปโหลดรูปสินค้า -->
+                <div class="mb-4">
+                    <label for="productImageInput" class="block text-gray-700">อัปโหลดรูปสินค้า:</label>
+                    <input type="file" id="productImageInput" name="image" accept="image/*"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg" onchange="previewImage(event)">
+                    <img id="productImagePreview" src=""
+                        style="display:none; max-width: 200px; margin-top: 10px;">
+                </div>
+
+                <div class="flex justify-end">
+                    <span onclick="closeCreateModal()"
+                        class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 cursor-pointer">ยกเลิก</span>
+                    <button type="submit"
+                        class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">บันทึกสินค้า</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- Modal for Editing Product -->
     <div id="editModal" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 hidden">
         <div class="bg-white p-6 rounded-lg w-96">
             <h3 class="text-2xl font-semibold text-gray-800 mb-4">แก้ไขสินค้า</h3>
-            <form id="editForm" method="POST" action="{{ route('product.update') }} "enctype="multipart/form-data">
+            <form id="editForm" method="POST"
+                action="{{ route('product.update') }} "enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="productId" name="product_id">
@@ -203,6 +261,29 @@
     </div>
 
     <script>
+        function openCreateModal() {
+            var modal = document.getElementById('productModal');
+            modal.classList.remove('hidden'); // เปิด Modal
+        }
+
+        // ฟังก์ชันปิด Modal การสร้างสินค้า
+        function closeCreateModal() {
+            var modal = document.getElementById('productModal');
+            modal.classList.add('hidden'); // ปิด Modal
+        }
+
+        // ฟังก์ชันพรีวิวรูปภาพ
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('productImagePreview');
+                output.src = reader.result;
+                output.style.classList.remove('hidden');
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+
         // เปิด Modal
         function openModal() {
             document.getElementById('editModal').classList.remove('hidden');
