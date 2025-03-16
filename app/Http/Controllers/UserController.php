@@ -42,6 +42,10 @@ class UserController extends Controller
     {
         return view('scan-store');
     }
+    public function scanOrder()
+    {
+        return view('merchant.scaner-detail');
+    }
     public function storeProduct(Request $request)
     {
         // ตรวจสอบค่าที่ส่งมาจากฟอร์ม
@@ -291,6 +295,86 @@ class UserController extends Controller
             ->first(); // Use first() since it should return one row
         return view('myOrdes', ['orders' => $orders, 'merchant' => $user]);
     }
+    public function getOrderDetails($orderId)
+    {
+        // ค้นหาข้อมูลออร์เดอร์ที่มี order_id ตรงกัน
+        $order = Order::where('order_id', $orderId)->first();
 
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+            ], 404);
+        }
+
+        // ดึงรายการสินค้าในออร์เดอร์นั้นๆ
+        $orderItems = OrderItem::where('order_id', $order->id)->get(); // ใช้ Eloquent Relationship
+
+        // รวมข้อมูลออร์เดอร์และรายการสินค้า
+        return response()->json([
+            'success' => true,
+            'order' => $order,
+            'items' => $orderItems,
+        ]);
+    }
+
+    public function updateOrderStatus(Request $request)
+    {
+        // เริ่มต้นการบันทึก log
+        Log::info("เริ่มการอัปเดตสถานะออร์เดอร์", ['order_id' => $request->order_id]);
+
+        // ค้นหาออร์เดอร์ที่ต้องการ
+        $order = Order::where('order_id', $request->order_id)->first();
+
+        // หากไม่พบออร์เดอร์
+        if (!$order) {
+            Log::error("ไม่พบออร์เดอร์", ['order_id' => $request->order_id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        // บันทึกการอัปเดตสถานะออร์เดอร์
+        Log::info("อัปเดตสถานะออร์เดอร์", ['order_id' => $order->order_id, 'old_status' => $order->order_status, 'new_status' => $request->status]);
+
+        // อัปเดตสถานะออร์เดอร์
+        $order->order_status = $request->status;
+        $order->save();
+
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+        foreach ($orderItems as $item) {
+            Log::info("อัปเดตสต๊อกสินค้า", [
+                'order_id' => $order->order_id,
+                'product_id' => $item->product_id,
+                'quantity_sold' => $item->qty
+            ]);
+
+            // หาสินค้าและหักสต๊อก
+            $product = Products::where('product_id', $item->product_id)
+                ->where('merchant_id', $order->merchant_id)->first();
+            if ($product) {
+                // หักสต๊อก
+                $product->amount -= $item->qty;
+                $product->save();
+
+                // บันทึกการหักสต๊อก
+                Log::info("หักสต๊อกสินค้า", [
+                    'product_id' => $product->id,
+                    'stock_after' => $product->amount
+                ]);
+            } else {
+                Log::warning("ไม่พบสินค้าสำหรับหักสต๊อก", ['product_id' => $item->product_id]);
+            }
+        }
+
+        // บันทึกการสำเร็จ
+        Log::info("การอัปเดตคำสั่งซื้อสำเร็จ", ['order_id' => $order->order_id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order updated successfully'
+        ]);
+    }
 
 }

@@ -37,7 +37,7 @@
         }
 
         .header {
-            background: #007bff;
+            background: #ff447c;
             color: #fff;
             font-size: 18px;
             padding: 15px;
@@ -122,9 +122,12 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* display: flex; */
+            display: flex;
+            /* ใช้ flex เพื่อให้จัดกลาง */
             justify-content: center;
+            /* จัดกึ่งกลางแนวนอน */
             align-items: center;
+            /* จัดกึ่งกลางแนวตั้ง */
             font-family: 'Kanit', sans-serif;
             overflow: hidden;
         }
@@ -138,6 +141,8 @@
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+            /* ใส่อนิเมชันให้สวยขึ้น */
         }
 
         .close-btn {
@@ -148,6 +153,19 @@
             font-size: 20px;
         }
 
+        /* อนิเมชัน fade in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         .modal-content label {
             display: block;
             text-align: left;
@@ -155,14 +173,7 @@
             font-weight: 600;
         }
 
-        .modal-content input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            display: block;
-        }
+
 
         .modal-content button {
             background: #28a745;
@@ -206,10 +217,10 @@
     <div class="container">
         <div class="header">
             <a class="back-btn" href="{{ route('merchant.welcome') }}">⬅️</a>
-            สแกนบาร์โค้ด
+            สแกนออเดอร์
         </div>
 
-        <h1>📷 Barcode Scanner</h1>
+        <h1>สแกนคำสั่งซื้อของลูกค้า</h1>
 
         <div id="barcode">
             <video id="barcodevideo" autoplay playsinline></video>
@@ -219,8 +230,6 @@
         <div id="result">
             <button id="generateBarcode"
                 class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">โค้ดร้านค้าของคุณ</button>
-            <a id="scan-order" href="{{route('merchant.scanOrder')}}"
-                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 ml-4">สแกนออเดอร์</a>
         </div>
         {{-- {{Auth::user()->id}} --}}
         <canvas id="barcodecanvas"></canvas>
@@ -228,40 +237,18 @@
     </div>
 
     <!-- Modal สำหรับเพิ่มสินค้า -->
-    <div id="productModal" class="modal">
+    <div id="orderModal" style="display: none" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
-            <h3>เพิ่มสินค้า</h3>
+            <h3>รายการคำสั่งซื้อ</h3>
 
-            <form method="POST" action="{{ route('product.store') }}" enctype="multipart/form-data">
-                {{-- <form method="POST" enctype="multipart/form-data"> --}}
-                @csrf
-                <input type="text" style="display: none" id="merchantId" name="merchantId"
-                    value="{{ Auth::user()->id }}">
-                <label>รหัสสินค้า:</label>
-                {{-- <input type="text" id="productCode" name="barcode" > --}}
-                <input type="text" id="productCode" name="barcode" readonly>
-
-                <label>ชื่อสินค้า:</label>
-                <input type="text" id="productName" name="name" required>
-
-                <label>ราคา (บาท):</label>
-                <input type="number" id="productPrice" name="price" min="0" step="0.01" required>
-
-                <label>จำนวนในคลัง:</label>
-                <input type="number" id="productStock" name="stock" min="0" required>
-
-                <label>อัปโหลดรูปสินค้า:</label>
-                <input type="file" id="productImageInput" name="image" accept="image/*"
-                    onchange="previewImage(event)">
-                <img id="productImagePreview" src="" style="display:none;">
-
+            <form method="POST" action="">
                 <button type="submit">💾 บันทึกสินค้า</button>
             </form>
         </div>
     </div>
 
-    <div id="barcodeModal" class="modal">
+    <div id="barcodeModal" style="display: none" class="modal">
         <div class="modal-content">
             <h2>Barcode ของร้านค้าของคุณ</h2>
             <svg id="Mybarcode"></svg>
@@ -294,7 +281,7 @@
                 // $('#result').html('📦 บาร์โค้ด: ' + barcode);
                 playSound();
                 isScanning = false;
-                showProductDetail(barcode);
+                showOrderDetail(barcode);
 
                 setTimeout(function() {
                     isScanning = true;
@@ -315,13 +302,111 @@
         window.location.href = "{{ url()->previous() }}";
     }
 
-    function showProductDetail(barcode) {
-        document.getElementById('productCode').value = barcode;
-        $('#productModal').css('display', 'flex').hide().fadeIn();
+    function showOrderDetail(orderId) {
+        $.ajax({
+            url: "/get-order-detail/" + orderId, // ส่ง orderId ไปที่ API
+            type: "GET",
+            success: function(response) {
+                if (response.success) {
+                    // เรียกฟังก์ชันแสดงผล Modal พร้อมข้อมูลออร์เดอร์
+                    updateOrderModal(response.order, response.items);
+                } else {
+                    alert("ไม่พบคำสั่งซื้อ");
+                }
+            },
+            error: function() {
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูลออร์เดอร์");
+            }
+        });
+    }
+
+    function updateOrderModal(order, items) {
+        let totalAmount = 0;
+
+        let modalContent = `
+        <div class="relative">
+            <!-- ปุ่มปิด Modal -->
+             <span class="absolute top-2 right-2 bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer" onclick="closeModal()">✖</span>
+            <p class="text-gray-700"><strong>รหัสออร์เดอร์:</strong> ${order.order_id}</p>
+            <p class="text-gray-700"><strong>สถานะ:</strong> ${getOrderStatusText(order.order_status)}</p>
+            <hr class="my-3">
+            <h4 class="text-lg font-semibold mb-2">สินค้าในออร์เดอร์</h4>
+            <div class="space-y-3">
+    `;
+
+        items.forEach(item => {
+            totalAmount += item.qty * item.price; // คำนวณยอดรวม
+
+            modalContent += `
+            <div class="bg-white p-4 shadow-md rounded-lg border border-gray-200 flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span class="text-gray-500">📦</span>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-medium text-gray-800">${item.name}</h5>
+                    <p class="text-gray-600 text-sm">จำนวน: <span class="font-semibold">${item.qty}</span> ชิ้น ราคา: <span class="font-semibold">${totalAmount.toFixed(2)}</span> บาท</p>
+                </div>
+            </div>
+        `;
+        });
+
+        modalContent += `
+            </div>
+            <hr class="my-3">
+            <!-- แสดงยอดรวมของบิล -->
+            <p class="text-lg font-semibold text-gray-800">💰 ยอดรวม: ${totalAmount.toFixed(2)} บาท</p>
+
+            <!-- ปุ่มกดสำเร็จ -->
+            <button class="mt-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 w-full" onclick="confirmOrder('${order.order_id}')">✅ ยืนยันคำสั่งซื้อ</button>
+        </div>
+    `;
+
+        $("#orderModal .modal-content").html(modalContent);
+        $("#orderModal").show(); // แสดง Modal
+    }
+
+    // ฟังก์ชันปิด Modal
+    function closeModal() {
+        $("#orderModal").hide();
+    }
+
+    // ฟังก์ชันเมื่อกดปุ่มสำเร็จ
+    function confirmOrder(orderId) {
+        $.ajax({
+            url: '/api/update-order-status', // เปลี่ยนเป็น URL API ของคุณ
+            type: 'POST',
+            data: {
+                order_id: orderId,
+                status: 'completed' // เปลี่ยนสถานะเป็น "เสร็จสิ้น"
+            },
+            success: function(response) {
+                alert("✅ คำสั่งซื้ออัปเดตเรียบร้อย!");
+                closeModal();
+            },
+            error: function(error) {
+                alert("❌ มีข้อผิดพลาดในการอัปเดตออร์เดอร์");
+                console.error(error);
+            }
+        });
+    }
+
+
+
+    function getOrderStatusText(status) {
+        switch (status) {
+            case 'pending':
+                return '⏳ กำลังดำเนินการ';
+            case 'success':
+                return '✅ เสร็จสิ้น';
+            case 'cancel':
+                return '❌ ยกเลิก';
+            default:
+                return '❔ ไม่ทราบสถานะ';
+        }
     }
 
     function closeModal() {
-        $('#productModal').fadeOut();
+        $("#orderModal").hide(); // ปิด Modal
     }
 
     function previewImage(event) {

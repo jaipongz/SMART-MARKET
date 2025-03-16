@@ -18,9 +18,10 @@ Route::get('/cart', function () {
 });
 Route::get('/verify-store', [UserController::class, 'verifyStore'])->name('user.verify');
 Route::get('/get-merchant-info', [UserController::class, 'getMerchantInfo']);
+Route::get('/get-order-detail/{orderId}', [UserController::class, 'getOrderDetails']);
 Route::post('/upload-merchant-profile', [UserController::class, 'updateProfilepic']);
 Route::post('/api/storeOrder', [UserController::class, 'createOrder'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-
+Route::post('/api/update-order-status', [UserController::class, 'updateOrderStatus'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/products', [UserController::class, 'update'])->name('product.update');
     Route::delete('/product/{id}', [UserController::class, 'destroy'])->name('product.destroy');
     Route::get('/merchant/home', [UserController::class, 'welcome'])->name('merchant.welcome');
+    Route::get('/merchant/getorder', [UserController::class, 'scanOrder'])->name('merchant.scanOrder');
     Route::get('/orders{merchantId}', [UserController::class, 'getOrdersByMerchantId'])->name('merchant.order');
 });
 
