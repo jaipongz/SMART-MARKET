@@ -329,6 +329,7 @@
 
             const orderId = generateOrderId();
             console.log(orderId);
+            generateBarcode(orderId);
 
             // Prepare the data to be sent to the storeOrder API
             const orderData = {
@@ -351,14 +352,13 @@
                         // Store the order ID in localStorage
                         localStorage.setItem('orderId', orderId);
 
-                        generateBarcode(orderId);
+                        // generateBarcode(orderId);
 
                         showModal();
 
                         localStorage.removeItem('cart');
 
-                        // alert("การซื้อเสร็จสิ้น!");
-                        // window.location.href = '/'; // Redirect to another page or reload the page
+                        // window.location.reload();
                     } else {
                         showErrorModal("เกิดข้อผิดพลาดในการยืนยันการซื้อ");
                     }
@@ -376,10 +376,14 @@
                 orderId = Math.floor(Math.random() * 1000000000000).toString();
             } while (orderId.startsWith('0')); // ตรวจสอบว่าขึ้นต้นด้วย '0' หรือไม่
 
-            return orderId;
+
+            const checkDigit = calculateEAN13CheckDigit(orderId);
+            return orderId + checkDigit;
         }
 
         function generateBarcode(orderId) {
+            console.log('Ongen --->', orderId);
+
             JsBarcode("#Mybarcode", orderId, {
                 format: "EAN13", // Barcode format (you can choose different formats)
                 lineColor: "#000000", // Barcode line color
@@ -388,6 +392,16 @@
                 displayValue: true, // Show the barcode number under the barcode
                 fontSize: 18, // Font size of the displayed value
             });
+        }
+
+        function calculateEAN13CheckDigit(orderId) {
+            let sum = 0;
+            for (let i = 0; i < orderId.length; i++) {
+                let num = parseInt(orderId[i]);
+                sum += (i % 2 === 0) ? num : num * 3;
+            }
+            let checkDigit = (10 - (sum % 10)) % 10;
+            return checkDigit.toString();
         }
 
         function showModal() {
@@ -425,7 +439,7 @@
                 link.href = canvas.toDataURL('image/png');
                 const now = new Date();
                 const datetime = now.toISOString().replace(/T/, '_').replace(/\..+/,
-                ''); 
+                    '');
                 link.download = `barcode-${datetime}.png`;
                 link.click();
             };

@@ -216,13 +216,12 @@
             <div id="scan-line"></div>
         </div>
 
-        <div id="result">
+        <div id="result" class="flex flex-col md:flex-row md:justify-between md:items-center">
             <button id="generateBarcode"
-                class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ml-4">โค้ดร้านค้าของคุณ</button>
-            <a id="scan-order" href="{{route('merchant.scanOrder')}}"
-                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 ml-4">สแกนออเดอร์</a>
+                class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 md:ml-4">โค้ดร้านค้าของคุณ</button>
+            <a id="scan-order" href="{{ route('merchant.scanOrder') }}"
+                class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 mt-2 md:mt-0 md:mr-4">สแกนออเดอร์</a>
         </div>
-        {{-- {{Auth::user()->id}} --}}
         <canvas id="barcodecanvas"></canvas>
         <canvas id="barcodecanvasg"></canvas>
     </div>
