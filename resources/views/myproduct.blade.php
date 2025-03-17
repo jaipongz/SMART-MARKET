@@ -141,6 +141,8 @@
                             </div>
                             <!-- ปุ่มแก้ไข & ลบ -->
                             <div class="mt-4 flex justify-end space-x-4">
+                                <button class="text-green-500 hover:text-green-700"
+                                        onclick="showModal('{{ $item->product_id }}','{{$item->product_name}}')">ดูบาร์โค้ด</button>
                                 <button
                                     onclick="editProduct('{{ $item->id }}', '{{ $item->product_name }}', '{{ $item->amount }}', '{{ $item->price }}', '{{ $item->product_pic }}')"
                                     class="text-yellow-500 hover:text-yellow-700">
