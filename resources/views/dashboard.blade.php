@@ -58,13 +58,31 @@
         a{
             text-decoration: none;
         }
+        .logo-container {
+            width: 120px; /* ขนาดของกรอบวงกลม */
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto; /* จัดกึ่งกลาง */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ครอบรูปให้พอดีวงกลม */
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>My Shop App</h1>
-    <img src="{{ secure_asset('public/assets/img/myshop.png')}}" alt="logo">
+    <div class="logo-container">
+            <img src="{{ secure_asset('public/assets/img/myshop.png')}}" alt="logo">
+    </div>
     <a class="button" href="{{route('merchantScan',[Auth::user()->id])}}" >เพิ่มสินค้า</a>
     <a class="button" href="{{route('getProducts',[Auth::user()->id])}}" >แดชบอร์ด</a>
 </div>
