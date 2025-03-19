@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Scanner</title>
+    <title>My Shop</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap">
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
