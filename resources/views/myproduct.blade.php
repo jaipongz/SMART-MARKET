@@ -53,16 +53,18 @@
             </div>
 
             <!-- ปุ่มเพิ่มสินค้า -->
-            <div class="mb-6 flex flex-col gap-2 md:flex-row md:gap-4">
+            <div class="mb-6 flex flex-col md:flex-row gap-2 md:gap-4">
                 <a href="{{ route('merchantScan', [Auth::user()->id]) }}"
-                    class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                    class="bg-green-600 text-white py-3 px-4 rounded hover:bg-green-700 flex items-center justify-center w-full md:w-auto text-center">
                     เพิ่มสินค้า
                 </a>
                 <button id="openModalBtn" onclick="openCreateModal()"
-                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    class="bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 flex items-center justify-center w-full md:w-auto text-center">
                     เพิ่มสินค้าที่ไม่มีบาร์โค้ด
                 </button>
             </div>
+            
+            
 
             <!-- ตารางสินค้า -->
             <div class="overflow-x-auto">
