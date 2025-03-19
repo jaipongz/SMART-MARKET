@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Scanner Home</title>
+    <title>My Shop</title>
+    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png')}}">
     <style>
         * {
             box-sizing: border-box;
@@ -62,7 +63,8 @@
 <body>
 
 <div class="container">
-    <h1>Barcode Scanner App</h1>
+    <h1>My Shop App</h1>
+    <img src="{{ secure_asset('public/assets/img/myshop.png')}}" alt="logo">
     <a class="button" href="{{route('merchantScan',[Auth::user()->id])}}" >เพิ่มสินค้า</a>
     <a class="button" href="{{route('getProducts',[Auth::user()->id])}}" >แดชบอร์ด</a>
 </div>
