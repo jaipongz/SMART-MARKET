@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Shop</title>
-    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png')}}">
+    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -269,7 +269,24 @@
                 });
                 cartItemsContainer.innerHTML = cartHTML;
             }
+
+            setTimeout(() => {
+                clearCart(); // ลบสินค้าทั้งหมดจากตะกร้า
+            }, 3 * 60 * 1000); // 3 นาทีในมิลลิวินาที
         });
+
+        function clearCart() {
+            localStorage.removeItem('cart'); // ลบข้อมูลจาก localStorage
+            alert("เวลาหมด! ตะกร้าถูกลบแล้ว.");
+            location.reload(); // อัปเดตหน้าตะกร้า
+        }
+
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1); // ลบสินค้าตาม index
+            localStorage.setItem('cart', JSON.stringify(cart));
+            location.reload(); // อัปเดตหน้าตะกร้า
+        }
 
         function showErrorModal(message) {
             $('#errorModalMessage').text(message);
@@ -405,7 +422,7 @@
             });
         }
 
-       
+
 
         function showModal() {
             const modal = document.getElementById('barcodeModal');

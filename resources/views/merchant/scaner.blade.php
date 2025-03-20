@@ -6,15 +6,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Shop</title>
-    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png')}}">
+    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap">
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     {{-- <link rel="stylesheet" href="https://pirate-town.manga208.com/public/assets/css/scaner.css'"> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 
     <style>
+        .modal-icon i {
+           
+                /* ปรับขนาดได้ตามต้องการ */
+        }
+
         body {
             font-family: 'Kanit', sans-serif;
             background-color: #f4f4f9;
@@ -114,7 +121,7 @@
         }
 
         .modal {
-            display: none;
+
             /* เริ่มซ่อน */
             position: fixed;
             z-index: 1000;
@@ -226,9 +233,30 @@
         <canvas id="barcodecanvas"></canvas>
         <canvas id="barcodecanvasg"></canvas>
     </div>
-
+    @if (session('error'))
+        <div id="errorModal" class="modal" style="display: flex">
+            <div class="modal-content  mx-4">
+                <span class="close-btn" onclick="closeErrorModal()">✖</span>
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-circle" style=" font-size: 120px;color: rgb(255, 70, 70)"></i> <!-- ใช้ FontAwesome -->
+                </div>
+                <p style="margin: 30px 0 20px" id="errorModalMessage">{{ session('error') }}</p>
+            </div>
+        </div>
+    @endif
+    @if (session('success'))
+        <div id="errorModal" class="modal" style="display: flex">
+            <div class="modal-content  mx-4">
+                <span class="close-btn" onclick="closeErrorModal()">✖</span>
+                <div class="modal-icon">
+                    <i class="fa-solid fa-circle-check" style=" font-size: 120px;color: rgb(2, 151, 9)"></i> <!-- ใช้ FontAwesome -->
+                </div>
+                <p style="margin: 30px 0 20px" id="errorModalMessage">{{ session('success') }}</p>
+            </div>
+        </div>
+    @endif
     <!-- Modal สำหรับเพิ่มสินค้า -->
-    <div id="productModal" class="modal">
+    <div id="productModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">✖</span>
             <h3>เพิ่มสินค้า</h3>
@@ -261,7 +289,7 @@
         </div>
     </div>
 
-    <div id="barcodeModal" class="modal">
+    <div id="barcodeModal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>Barcode ของร้านค้าของคุณ</h2>
             <svg id="Mybarcode"></svg>
@@ -361,6 +389,10 @@
     document.getElementById('closeBarModal').addEventListener('click', function() {
         document.getElementById('barcodeModal').style.display = 'none';
     });
+
+    function closeErrorModal() {
+        $('#errorModal').fadeOut();
+    }
 </script>
 
 </html>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Shop</title>
-    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png')}}">
+    <link rel="icon" type="image/x-icon" href="{{ secure_asset('public/assets/img/myshop.png') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap">
     <script src="https://pirate-town.manga208.com/public/assets/js/jquery.js"></script>
     <script src="https://pirate-town.manga208.com/public/assets/js/barcode.js"></script>
@@ -19,6 +19,7 @@
         let merchantId;
         let productId;
         let producPic;
+
         $(document).ready(function() {
             initBarcodeScanner();
 
@@ -50,23 +51,8 @@
         });
 
         function goBack() {
-            window.history.back();  // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
+            window.history.back(); // หรือใช้ history.back(); ถ้าอยากให้ย้อนหน้าก่อนหน้า
         }
-        // function showProductDetail(barcode) {
-        // 	// ตัวอย่างข้อมูลสินค้า (จริงๆควรดึงจากระบบหรือ API ตามบาร์โค้ดที่ได้มา)
-        // 	const mockProduct = {
-        // 		image: 'https://3auntiesthaimarket.com/cdn/shop/products/Oishi-500-ml-Original_530x@2x.png?v=1646084127',  // เอารูปจริงมาใส่ทีหลังได้
-        // 		name: 'สินค้า ' + barcode,
-        // 		price: 25
-        // 	};
-
-        // 	$('#productImage').attr('src', mockProduct.image);
-        // 	$('#productName').text(mockProduct.name);
-        // 	$('#productPrice').text(`ราคา: ฿${mockProduct.price.toFixed(2)}`);
-        // 	$('#productQty').val(1);  // เริ่มต้น 1 ชิ้น
-
-        // 	$('#productModal').fadeIn();
-        // }
 
         function showProductDetail(barcode) {
             // ดึง merchantId จาก query parameter หรือจากตัวแปรที่เก็บไว้
@@ -170,8 +156,8 @@
 
         function addToCart() {
             const product = {
-                product_pic:producPic,
-                product_stock:maxQty,
+                product_pic: producPic,
+                product_stock: maxQty,
                 produc_id: productId,
                 merchant_id: merchantId,
                 name: $('#productName').text(),
@@ -199,6 +185,7 @@
 <body>
 
     <div class="container">
+
         <div class="header bg-green-600">
             <button class="back-btn" onclick="goBack()">⬅️</button>
             ซื้อสินค้า
@@ -237,6 +224,8 @@
             </div>
         </div>
     </div>
+
+    
 
     <div id="errorModal" style="display:none;" class="modal">
         <div class="modal-content  mx-4">

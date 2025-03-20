@@ -48,25 +48,27 @@ class UserController extends Controller
     }
     public function storeProduct(Request $request)
     {
-        // ตรวจสอบค่าที่ส่งมาจากฟอร์ม
-        // $request->validate([
-        //     'merchantId' => 'required|exists:users,id',
-        //     'barcode' => 'required|string', // product_id ห้ามซ้ำ
-        //     'name' => 'required|string',
-        //     'price' => 'required|numeric|min:0',
-        //     'stock' => 'required|integer|min:0',
-        //     'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        // ]);
-
-        // dd($request->all());
+        // ตรวจสอบว่า request มี barcode หรือไม่ ถ้าไม่มีให้สร้างใหม่
         if (!$request->has('barcode')) {
             $barcode = $this->generateBarcode();
         } else {
             $barcode = $request->barcode;
         }
 
-        // dd($barcode);
-        // แปลงรูปภาพเป็น Base64
+        $merchantId = $request->merchantId;
+
+        // ตรวจสอบว่าสินค้านี้มีอยู่แล้วหรือไม่
+        $existingProduct = Products::where('product_id', $barcode)
+            ->where('merchant_id', $merchantId)
+            ->first();
+
+        if ($existingProduct) {
+            session()->flash('error', 'สินค้านี้มีอยู่แล้วในร้านค้า!');
+            session()->reflash(); // บังคับให้ session อยู่ต่อ
+            return redirect()->back();
+
+        }
+
         $imageBase64 = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -76,13 +78,13 @@ class UserController extends Controller
         // บันทึกสินค้า
         Products::create([
             'product_id' => $barcode, // ใช้ barcode เป็น product_id
-            'merchant_id' => $request->merchantId,
+            'merchant_id' => $merchantId,
             'product_name' => $request->name,
             'product_pic' => $imageBase64, // เก็บ Base64
             'amount' => $request->stock, // stock
             'price' => $request->price,
         ]);
-
+        // dd(session()->all());
         return redirect()->back()->with('success', 'เพิ่มสินค้าสำเร็จ!');
     }
     public function generateBarcode()
@@ -381,6 +383,10 @@ class UserController extends Controller
         $order->order_status = $request->status;
         $order->save();
 
+        // อัปเดตยอดรวมของออร์เดอร์ใหม่
+        $totalAmount = 0;
+
+        // ตรวจสอบสินค้าทั้งหมดในออร์เดอร์
         $orderItems = OrderItem::where('order_id', $order->id)->get();
         foreach ($orderItems as $item) {
             Log::info("อัปเดตสต๊อกสินค้า", [
@@ -392,18 +398,53 @@ class UserController extends Controller
             // หาสินค้าและหักสต๊อก
             $product = Products::where('product_id', $item->product_id)
                 ->where('merchant_id', $order->merchant_id)->first();
-            if ($product) {
-                // หักสต๊อก
-                $product->amount -= $item->qty;
-                $product->save();
 
-                // บันทึกการหักสต๊อก
-                Log::info("หักสต๊อกสินค้า", [
-                    'product_id' => $product->id,
-                    'stock_after' => $product->amount
-                ]);
+            if ($product) {
+                // เช็คให้สต๊อกไม่ติดลบ
+                if ($product->amount >= $item->qty) {
+                    // หักสต๊อก
+                    $product->amount -= $item->qty;
+                    $product->save();
+
+                    // บันทึกการหักสต๊อก
+                    Log::info("หักสต๊อกสินค้า", [
+                        'product_id' => $product->id,
+                        'stock_after' => $product->amount
+                    ]);
+
+                    // อัปเดตยอดรวมในออร์เดอร์
+                    $totalAmount += $item->qty * $item->price; // คำนวณยอดรวมใหม่
+                } else {
+                    // ถ้าสินค้าหมด ให้แจ้งเตือน
+                    Log::warning("สินค้าหมด", ['product_id' => $item->product_id]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Insufficient stock for product: ' . $item->product_id
+                    ], 400);
+                }
             } else {
                 Log::warning("ไม่พบสินค้าสำหรับหักสต๊อก", ['product_id' => $item->product_id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found: ' . $item->product_id
+                ], 404);
+            }
+        }
+
+        // อัปเดตยอดรวมในออร์เดอร์
+        $order->total_amount = $totalAmount; // อัปเดตยอดรวมใหม่
+        $order->save();
+
+        // อัปเดตยอดรวมใน OrderDetail
+        foreach ($orderItems as $item) {
+            $orderDetail = OrderItem::where('order_id', $order->id)
+                ->where('product_id', $item->product_id)
+                ->first();
+
+            if ($orderDetail) {
+                // อัปเดตราคาสินค้าในดีเทล
+                $orderDetail->total_price = $item->qty * $item->price;
+                $orderDetail->save();
             }
         }
 
@@ -415,6 +456,7 @@ class UserController extends Controller
             'message' => 'Order updated successfully'
         ]);
     }
+
 
     public function cancelOrder($id)
     {
